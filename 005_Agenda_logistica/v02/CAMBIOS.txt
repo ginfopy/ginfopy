@@ -1,0 +1,8 @@
+v02 — Sistema multiusuario
+- Login con usuario + contraseña
+- Cada usuario ve y gestiona solo sus propios eventos
+- Usuario administrador ve todos los eventos integrados
+- Admin puede filtrar la vista por usuario
+- Admin puede crear y eliminar usuarios
+- Gestión de contraseñas con hash SHA-256 (crypto.subtle)
+- Session en sessionStorage (se cierra al cerrar el navegador)

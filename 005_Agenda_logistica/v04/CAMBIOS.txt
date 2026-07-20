@@ -1,0 +1,2 @@
+v04 — Base antes de implementar panel estadístico (ítems 8-13)
+Estado idéntico a v03. Respaldo previo al bloque de estadísticas del administrador.

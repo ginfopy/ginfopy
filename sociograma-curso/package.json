@@ -1,0 +1,7 @@
+{
+  "name": "sociograma-curso",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  }
+}

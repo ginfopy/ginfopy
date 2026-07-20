@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Teleprónter</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --text: #f0f0f0;
+    --accent: #e8c84a;
+    --ui-bg: rgba(15,15,15,0.96);
+    --ui-border: rgba(255,255,255,0.08);
+    --font-size: 42px;
+    --speed: 1;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* ── EDITOR ──────────────────────────────── */
+  #editor-screen {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: #111;
+  }
+
+  #editor-header {
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid var(--ui-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--ui-bg);
+  }
+
+  #editor-header h1 {
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  #editor-header span {
+    font-size: 11px;
+    color: #555;
+    letter-spacing: 0.08em;
+  }
+
+  #script-input {
+    flex: 1;
+    background: #0d0d0d;
+    border: none;
+    outline: none;
+    color: #ddd;
+    font-family: inherit;
+    font-size: 18px;
+    line-height: 1.7;
+    padding: 24px 20px;
+    resize: none;
+    caret-color: var(--accent);
+  }
+
+  #script-input::placeholder { color: #333; }
+
+  #editor-footer {
+    background: var(--ui-bg);
+    border-top: 1px solid var(--ui-border);
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .controls-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ctrl-label {
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    min-width: 90px;
+  }
+
+  input[type=range] {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #333;
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .ctrl-value {
+    font-size: 13px;
+    color: var(--accent);
+    min-width: 36px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .toggle-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 10px 8px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    color: #888;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .toggle-btn.active {
+    background: #1f1b08;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  #start-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 2px;
+  }
+
+  #start-btn:active { opacity: 0.85; }
+
+  /* ── PROMPTER ─────────────────────────────── */
+  #prompter-screen {
+    display: none;
+    height: 100dvh;
+    width: 100%;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  #text-track {
+    position: absolute;
+    width: 100%;
+    padding: 50vh 28px;
+    will-change: transform;
+  }
+
+  #prompt-text {
+    font-size: var(--font-size);
+    line-height: 1.55;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Máscara de degradado top/bottom para que el foco sea el centro */
+  #prompter-screen::before,
+  #prompter-screen::after {
+    content: '';
+    position: fixed;
+    left: 0; right: 0;
+    height: 28vh;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #prompter-screen::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--bg) 30%, transparent);
+  }
+  #prompter-screen::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--bg) 30%, transparent);
+  }
+
+  /* Línea guía central */
+  #guide-line {
+    position: fixed;
+    top: 50%;
+    left: 0; right: 0;
+    height: 2px;
+    background: rgba(232,200,74,0.18);
+    z-index: 5;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  /* Espejo */
+  .mirror #text-track { transform: scaleX(-1); }
+
+  /* ── HUD de control ───────────────────────── */
+  #hud {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--ui-bg);
+    border-top: 1px solid var(--ui-border);
+    padding: 14px 20px 20px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform .3s ease;
+  }
+
+  #hud.hidden {
+    transform: translateY(100%);
+  }
+
+  #hud-speed-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #hud-speed-row .ctrl-label { min-width: 60px; }
+
+  .hud-btn {
+    padding: 12px 20px;
+    border: 1px solid #2a2a2a;
+    border-radius: 7px;
+    background: #1a1a1a;
+    color: #ccc;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hud-btn:active { opacity: 0.75; }
+
+  #hud-btns {
+    display: flex;
+    gap: 8px;
+  }
+
+  #hud-btns .hud-btn { flex: 1; justify-content: center; }
+
+  #play-pause-btn {
+    background: var(--accent);
+    color: #0a0a0a;
+    border-color: var(--accent);
+    font-weight: 700;
+    flex: 2 !important;
+    font-size: 14px;
+  }
+
+  /* Toque en pantalla para ocultar/mostrar HUD */
+  #tap-zone {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ PANTALLA EDITOR ═══ -->
+<div id="editor-screen">
+  <div id="editor-header">
+    <h1>Teleprónter</h1>
+    <span>Colegio Cerritos</span>
+  </div>
+
+  <textarea id="script-input" placeholder="Pegá o escribí el guión aquí…"></textarea>
+
+  <div id="editor-footer">
+
+    <div class="controls-row">
+      <span class="ctrl-label">Velocidad</span>
+      <input type="range" id="speed-slider" min="10" max="200" value="60" step="5">
+      <span class="ctrl-value" id="speed-val">60</span>
+    </div>
+
+    <div class="controls-row">
+      <span class="ctrl-label">Tamaño</span>
+      <input type="range" id="size-slider" min="24" max="80" value="42" step="2">
+      <span class="ctrl-value" id="size-val">42</span>
+    </div>
+
+    <div class="toggle-row">
+      <button class="toggle-btn" id="mirror-toggle">
+        <span>⇌</span> Espejo
+      </button>
+      <button class="toggle-btn" id="invert-toggle">
+        <span>◑</span> Fondo blanco
+      </button>
+    </div>
+
+    <button id="start-btn">▶ COMENZAR</button>
+
+  </div>
+</div>
+
+<!-- ═══ PANTALLA TELEPRÓNTER ═══ -->
+<div id="prompter-screen">
+  <div id="guide-line"></div>
+  <div id="text-track">
+    <div id="prompt-text"></div>
+  </div>
+  <div id="tap-zone"></div>
+
+  <div id="hud">
+    <div id="hud-speed-row">
+      <span class="ctrl-label">Vel.</span>
+      <input type="range" id="hud-speed" min="10" max="200" value="60" step="5">
+      <span class="ctrl-value" id="hud-speed-val">60</span>
+    </div>
+    <div id="hud-btns">
+      <button class="hud-btn" id="play-pause-btn">⏸ Pausa</button>
+      <button class="hud-btn" id="restart-btn">⟳ Inicio</button>
+      <button class="hud-btn" id="exit-btn">✕ Salir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Estado ───────────────────────────────────────
+  let speed = 60;         // px / segundo
+  let fontSize = 42;
+  let isMirror = false;
+  let isInverted = false;
+  let isPlaying = false;
+  let currentY = 0;
+  let lastTimestamp = null;
+  let rafId = null;
+  let hudVisible = true;
+  let hudTimer = null;
+
+  // ── Refs ──────────────────────────────────────────
+  const editorScreen   = document.getElementById('editor-screen');
+  const prompterScreen = document.getElementById('prompter-screen');
+  const scriptInput    = document.getElementById('script-input');
+  const promptText     = document.getElementById('prompt-text');
+  const textTrack      = document.getElementById('text-track');
+  const hud            = document.getElementById('hud');
+  const tapZone        = document.getElementById('tap-zone');
+
+  const speedSlider    = document.getElementById('speed-slider');
+  const speedVal       = document.getElementById('speed-val');
+  const sizeSlider     = document.getElementById('size-slider');
+  const sizeVal        = document.getElementById('size-val');
+  const mirrorToggle   = document.getElementById('mirror-toggle');
+  const invertToggle   = document.getElementById('invert-toggle');
+  const startBtn       = document.getElementById('start-btn');
+
+  const playPauseBtn   = document.getElementById('play-pause-btn');
+  const restartBtn     = document.getElementById('restart-btn');
+  const exitBtn        = document.getElementById('exit-btn');
+  const hudSpeed       = document.getElementById('hud-speed');
+  const hudSpeedVal    = document.getElementById('hud-speed-val');
+
+  // ── Editor: controles ─────────────────────────────
+  speedSlider.addEventListener('input', () => {
+    speed = +speedSlider.value;
+    speedVal.textContent = speed;
+  });
+
+  sizeSlider.addEventListener('input', () => {
+    fontSize = +sizeSlider.value;
+    sizeVal.textContent = fontSize;
+    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+  });
+
+  mirrorToggle.addEventListener('click', () => {
+    isMirror = !isMirror;
+    mirrorToggle.classList.toggle('active', isMirror);
+  });
+
+  invertToggle.addEventListener('click', () => {
+    isInverted = !isInverted;
+    invertToggle.classList.toggle('active', isInverted);
+    if (isInverted) {
+      document.documentElement.style.setProperty('--bg', '#f5f5f5');
+      document.documentElement.style.setProperty('--text', '#111');
+    } else {
+      document.documentElement.style.setProperty('--bg', '#0a0a0a');
+      document.documentElement.style.setProperty('--text', '#f0f0f0');
+    }
+  });
+
+  startBtn.addEventListener('click', () => {
+    const text = scriptInput.value.trim();
+    if (!text) { scriptInput.focus(); return; }
+    launchPrompter(text);
+  });
+
+  // ── Lanzar Prompter ───────────────────────────────
+  function launchPrompter(text) {
+    promptText.textContent = text;
+    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+
+    prompterScreen.classList.toggle('mirror', isMirror);
+    hudSpeed.value = speed;
+    hudSpeedVal.textContent = speed;
+
+    currentY = 0;
+    textTrack.style.transform = `translateY(${currentY}px)`;
+
+    editorScreen.style.display = 'none';
+    prompterScreen.style.display = 'block';
+
+    // Pantalla completa si el navegador lo permite
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    isPlaying = true;
+    playPauseBtn.textContent = '⏸ Pausa';
+    lastTimestamp = null;
+    scheduleHudHide();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // ── Animación ─────────────────────────────────────
+  function tick(ts) {
+    if (isPlaying) {
+      if (lastTimestamp !== null) {
+        const delta = (ts - lastTimestamp) / 1000;
+        currentY -= speed * delta;
+
+        // Límite inferior: no pasar del fin del texto
+        const maxScroll = -(textTrack.scrollHeight - window.innerHeight);
+        if (currentY < maxScroll) {
+          currentY = maxScroll;
+          isPlaying = false;
+          playPauseBtn.textContent = '▶ Reanudar';
+          showHud();
+        }
+      }
+      lastTimestamp = ts;
+      textTrack.style.transform = `translateY(${currentY}px)`;
+    } else {
+      lastTimestamp = null;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // ── HUD speed slider ──────────────────────────────
+  hudSpeed.addEventListener('input', () => {
+    speed = +hudSpeed.value;
+    hudSpeedVal.textContent = speed;
+    resetHudTimer();
+  });
+
+  // ── Botones HUD ───────────────────────────────────
+  playPauseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    isPlaying = !isPlaying;
+    playPauseBtn.textContent = isPlaying ? '⏸ Pausa' : '▶ Reanudar';
+    if (isPlaying) scheduleHudHide();
+    else clearTimeout(hudTimer);
+  });
+
+  restartBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentY = 0;
+    textTrack.style.transform = `translateY(0)`;
+    isPlaying = true;
+    playPauseBtn.textContent = '⏸ Pausa';
+    scheduleHudHide();
+  });
+
+  exitBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cancelAnimationFrame(rafId);
+    isPlaying = false;
+    prompterScreen.style.display = 'none';
+    editorScreen.style.display = 'flex';
+    if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  });
+
+  // ── Tap para mostrar/ocultar HUD ──────────────────
+  tapZone.addEventListener('click', () => {
+    if (hudVisible) hideHud();
+    else { showHud(); if (isPlaying) scheduleHudHide(); }
+  });
+
+  function showHud() {
+    hud.classList.remove('hidden');
+    hudVisible = true;
+  }
+
+  function hideHud() {
+    hud.classList.add('hidden');
+    hudVisible = false;
+  }
+
+  function scheduleHudHide() {
+    clearTimeout(hudTimer);
+    hudTimer = setTimeout(hideHud, 3000);
+  }
+
+  function resetHudTimer() {
+    clearTimeout(hudTimer);
+    if (isPlaying) scheduleHudHide();
+  }
+
+  // ── Swipe: ajuste fino de velocidad ──────────────
+  let touchStartX = null;
+  let touchStartSpeed = speed;
+
+  prompterScreen.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartSpeed = speed;
+    }
+  }, { passive: true });
+
+  prompterScreen.addEventListener('touchmove', (e) => {
+    if (touchStartX === null || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const newSpeed = Math.max(10, Math.min(200, Math.round(touchStartSpeed + dx / 4)));
+    speed = newSpeed;
+    hudSpeed.value = speed;
+    hudSpeedVal.textContent = speed;
+    showHud();
+  }, { passive: true });
+
+  prompterScreen.addEventListener('touchend', () => {
+    touchStartX = null;
+    if (isPlaying) scheduleHudHide();
+  }, { passive: true });
+
+  // ── Teclado (por si se usa con teclado Bluetooth) ─
+  document.addEventListener('keydown', (e) => {
+    if (prompterScreen.style.display === 'none') return;
+    if (e.code === 'Space' || e.code === 'KeyP') {
+      e.preventDefault();
+      isPlaying = !isPlaying;
+      playPauseBtn.textContent = isPlaying ? '⏸ Pausa' : '▶ Reanudar';
+    }
+    if (e.code === 'ArrowUp')   speed = Math.min(200, speed + 5);
+    if (e.code === 'ArrowDown') speed = Math.max(10,  speed - 5);
+    hudSpeed.value = speed;
+    hudSpeedVal.textContent = speed;
+  });
+</script>
+</body>
+</html>

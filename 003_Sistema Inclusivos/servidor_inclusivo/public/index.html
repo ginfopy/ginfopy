@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inclusivo — Colegio Presbiteriano Cerritos</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root { --azul-osc:#1F3864; --azul-med:#2E75B6; --azul-clar:#DEEAF1; }
+*{box-sizing:border-box;}
+body{background:#eef2f7;font-family:Arial,sans-serif;margin:0;}
+
+/* SIDEBAR */
+#sidebar{width:230px;min-height:100vh;background:var(--azul-osc);position:fixed;top:0;left:0;z-index:200;display:flex;flex-direction:column;overflow-y:auto;}
+#sidebar .brand{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.12);}
+#sidebar .brand .inst{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+#sidebar .brand .name{color:#fff;font-size:14px;font-weight:700;line-height:1.2;}
+#sidebar .brand .sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px;}
+#sidebar .nav-section{font-size:10px;color:rgba(255,255,255,.35);padding:14px 14px 4px;letter-spacing:.8px;text-transform:uppercase;}
+#sidebar a.nav-link{color:rgba(255,255,255,.72);padding:9px 14px;display:flex;align-items:center;gap:10px;font-size:13px;border-radius:0;transition:.15s;cursor:pointer;text-decoration:none;}
+#sidebar a.nav-link:hover,#sidebar a.nav-link.active{background:var(--azul-med);color:#fff;}
+#sidebar a.nav-link i{font-size:15px;width:18px;flex-shrink:0;}
+#sidebar .footer{margin-top:auto;padding:12px 14px;font-size:10px;color:rgba(255,255,255,.35);border-top:1px solid rgba(255,255,255,.1);}
+
+/* MAIN */
+#main{margin-left:230px;min-height:100vh;}
+.page{display:none;padding:22px 24px;}
+.page.active{display:block;}
+
+/* PAGE TITLE */
+.page-title{background:var(--azul-osc);color:#fff;padding:13px 18px;border-radius:8px;margin-bottom:18px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.page-title .badge-norm{font-size:10px;font-weight:normal;background:rgba(255,255,255,.15);padding:3px 8px;border-radius:20px;margin-left:auto;}
+
+/* STAT CARDS */
+.stat-card{background:#fff;border-radius:8px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.07);border-left:4px solid var(--azul-med);cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;user-select:none;}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.14);background:#f7fbff;}
+.stat-card:active{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.1);}
+.stat-card .num{font-size:1.9rem;font-weight:700;line-height:1;}
+.stat-card .lbl{font-size:11px;color:#666;margin-top:5px;}
+.stat-card .hint{font-size:10px;color:#2E75B6;margin-top:6px;opacity:0;transition:opacity .15s;}
+.stat-card:hover .hint{opacity:1;}
+.stat-card i{font-size:1.8rem;opacity:.6;}
+@keyframes flashAlert{0%{background:#fff3cd}60%{background:#fff3cd}100%{background:transparent}}
+.flash-alert{animation:flashAlert 1.5s ease-out;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .8s linear infinite;}
+
+/* TABLES */
+.table-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.07);overflow:hidden;}
+.table-card .table{margin:0;font-size:12.5px;}
+.table-card .table thead th{background:var(--azul-med);color:#fff;font-weight:600;font-size:11.5px;white-space:nowrap;border:none;padding:9px 10px;}
+.table-card .table tbody td{padding:7px 10px;vertical-align:middle;}
+.table-card .table tbody tr:nth-child(even){background:#f8f9fa;}
+.table-card .table tbody tr:hover{background:#e8f0fb !important;}
+
+/* ALERT ROWS */
+.row-vencido{background:#FCE4D6 !important;}
+.row-urgente{background:#FCE9D9 !important;}
+.row-proximo{background:#FFF9CC !important;}
+
+/* BADGES */
+.bd-vencido{background:#FCE4D6;color:#C00000;border:1px solid #C00000;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-urgente{background:#FCE9D9;color:#C55A11;border:1px solid #C55A11;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-proximo{background:#FFF2CC;color:#7F6000;border:1px solid #BF9000;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-ok{background:#E2EFDA;color:#375623;border:1px solid #375623;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-nf{background:#e9ecef;color:#666;border:1px solid #ccc;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.toolbar input,.toolbar select{font-size:12.5px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;outline:none;}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--azul-med);}
+.btn-add{background:var(--azul-med);color:#fff;border:none;padding:7px 15px;border-radius:6px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;}
+.btn-add:hover{background:var(--azul-osc);}
+.btn-edit{background:#e3f0ff;border:1px solid var(--azul-med);color:var(--azul-med);padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;}
+.btn-del{background:#fce4d6;border:1px solid #c00;color:#c00;padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;}
+.btn-print{background:#fff;border:1px solid #ccc;color:#333;padding:7px 13px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.btn-print:hover{background:#f0f0f0;}
+
+/* MODAL */
+.modal-header{background:var(--azul-osc);color:#fff;}
+.modal-header .btn-close{filter:invert(1);}
+.form-label{font-size:11.5px;font-weight:600;color:#333;margin-bottom:3px;}
+.form-control,.form-select{font-size:12.5px;}
+
+/* PROGRESS BARS */
+.pct-bar{height:8px;border-radius:4px;background:#e9ecef;overflow:hidden;width:70px;display:inline-block;vertical-align:middle;margin-left:5px;}
+.pct-bar-fill{height:100%;border-radius:4px;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px 20px;color:#999;}
+.empty-state i{font-size:3rem;margin-bottom:12px;display:block;}
+
+/* NORMATIVA BOX */
+.norm-box{background:#f0f7ff;border:1px solid #bdd7ee;border-radius:6px;padding:10px 14px;font-size:11px;color:#1F3864;margin-bottom:14px;}
+.norm-box strong{display:block;margin-bottom:4px;}
+
+/* V2: paginación, búsqueda, gráficos, expediente */
+.pagination-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f8f9fa;border-top:1px solid #e9ecef;font-size:12px;}
+.pg-btns{display:flex;gap:4px;align-items:center;}
+.pg-btn{min-width:30px;height:28px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;font-size:12px;}
+.pg-btn.active{background:var(--azul-med);color:#fff;border-color:var(--azul-med);}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed;}
+.pg-dots{padding:0 4px;color:#999;}
+.pg-info{color:#666;}
+.chart-card{background:#fff;border-radius:8px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.07);height:280px;}
+.chart-card h6{font-size:12px;font-weight:700;color:var(--azul-osc);margin-bottom:10px;}
+#search-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:none;align-items:flex-start;justify-content:center;padding-top:12vh;}
+.search-panel{background:#fff;border-radius:12px;width:min(560px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;}
+.search-panel input{width:100%;border:none;border-bottom:2px solid var(--azul-clar);padding:16px 18px;font-size:16px;outline:none;}
+#search-results{max-height:360px;overflow-y:auto;}
+.search-item{padding:12px 18px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.search-item:hover{background:#f0f7ff;}
+.search-item strong{display:block;font-size:13px;color:var(--azul-osc);}
+.search-item small{color:#666;font-size:11px;}
+.search-tipo{font-size:10px;background:var(--azul-clar);color:var(--azul-osc);padding:2px 7px;border-radius:10px;margin-right:6px;}
+.search-hint{padding:20px;text-align:center;color:#999;font-size:13px;}
+.expediente-wrap{font-size:12.5px;}
+.exp-stat{background:var(--azul-clar);border-radius:8px;padding:12px;text-align:center;}
+.exp-num{font-size:1.5rem;font-weight:700;color:var(--azul-osc);}
+.exp-lbl{font-size:10px;color:#555;margin-top:4px;}
+.exp-section{margin-bottom:14px;}
+.exp-section h6{font-size:12px;font-weight:700;color:var(--azul-osc);border-bottom:2px solid var(--azul-med);padding-bottom:4px;margin-bottom:8px;}
+.exp-list{font-size:12px;padding-left:18px;margin:0;}
+.exp-list li{margin-bottom:5px;}
+.btn-exp{background:#e2efda;border:1px solid #375623;color:#375623;padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;}
+
+@media print{
+  #sidebar{display:none;}
+  #main{margin-left:0;}
+  .toolbar,.btn-add,.btn-edit,.btn-del,.btn-print,.modal{display:none!important;}
+  .page{display:block!important;padding:10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<div id="sidebar">
+  <div class="brand">
+    <div class="inst">Sistema Educativo</div>
+    <div class="name">Colegio Presbiteriano<br>Cerritos</div>
+    <div class="sub">Gestión de Educación Inclusiva</div>
+  </div>
+  <div class="nav-section">Secciones</div>
+  <a class="nav-link active" onclick="showPage('dashboard')"><i class="bi bi-speedometer2"></i>Panel de Alertas</a>
+  <a class="nav-link" onclick="showPage('alumnos')"><i class="bi bi-people-fill"></i>Alumnos Inclusivos</a>
+  <a class="nav-link" onclick="showPage('familias')"><i class="bi bi-handshake-fill"></i>Compromisos Familias</a>
+  <a class="nav-link" onclick="showPage('documentos')"><i class="bi bi-file-earmark-text-fill"></i>Documentos MEC</a>
+  <a class="nav-link" onclick="showPage('seguimiento')"><i class="bi bi-graph-up-arrow"></i>Seguimiento Académico</a>
+  <a class="nav-link" onclick="showPage('calendario')"><i class="bi bi-calendar3"></i>Calendario 2026</a>
+  <div class="nav-section">Herramientas</div>
+  <a class="nav-link" onclick="abrirBusqueda()"><i class="bi bi-search"></i>Búsqueda global <small style="opacity:.5;margin-left:auto">Ctrl+K</small></a>
+  <a class="nav-link" onclick="showPage('historial')"><i class="bi bi-clock-history"></i>Historial de actividad</a>
+  <div class="nav-section">Sistema</div>
+  <a class="nav-link" onclick="recargarDatos()"><i class="bi bi-arrow-clockwise"></i>Recargar del servidor</a>
+  <a class="nav-link" onclick="exportarDatos()"><i class="bi bi-download"></i>Exportar datos</a>
+  <a class="nav-link" onclick="importarDatos()"><i class="bi bi-upload"></i>Importar datos</a>
+  <input type="file" id="import-input" accept=".json" style="display:none" onchange="cargarArchivo(event)">
+  <div class="footer">
+    <div style="background:rgba(255,255,255,.06);border-radius:6px;padding:8px 10px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span id="file-status-icon" style="font-size:14px;flex-shrink:0"><i class="bi bi-circle text-secondary"></i></span>
+        <span style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px">Archivo de datos</span>
+      </div>
+      <div id="file-status-name" style="font-size:11px;color:rgba(255,255,255,.8);word-break:break-all;line-height:1.3">Sin archivo conectado</div>
+      <a onclick="sessionStorage.removeItem('app_pw');location.reload()" style="font-size:10px;color:#7fb3d9;cursor:pointer;margin-top:4px;display:inline-block">Cambiar clave…</a>
+    </div>
+    <strong style="font-size:11px">Lic. Rodrigo Godoy</strong><br>
+    <span style="font-size:10px;opacity:.5">Director Nivel Secundario · 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div id="main">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-title">
+      <i class="bi bi-speedometer2"></i>Panel de Alertas — Educación Inclusiva
+      <span class="badge-norm" id="dash-fecha"></span>
+    </div>
+    <div class="row g-3 mb-4" id="stats-row"></div>
+    <div class="row g-3 mb-4" id="charts-row"></div>
+    <div class="table-card p-3 mb-3">
+      <h6 style="color:var(--azul-osc);font-weight:700;border-bottom:2px solid var(--azul-med);padding-bottom:6px;margin-bottom:12px">
+        <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Vencidos y Próximos a Vencer (≤ 30 días)
+      </h6>
+      <div id="alert-table"></div>
+    </div>
+    <div class="norm-box">
+      <strong><i class="bi bi-bookmark-fill me-1"></i>Normativa de referencia</strong>
+      Ley N° 5136/2013 — Educación Inclusiva &nbsp;|&nbsp; Res. MEC N° 29.664/2012 &nbsp;|&nbsp; Decreto N° 1.350/2019 &nbsp;|&nbsp; Res. N° 29.451/2010 &nbsp;|&nbsp; Ley N° 4962/2013 (SENADIS)
+    </div>
+  </div>
+
+  <!-- ALUMNOS -->
+  <div id="page-alumnos" class="page">
+    <div class="page-title"><i class="bi bi-people-fill"></i>Registro de Alumnos Inclusivos <span id="cnt-alumnos" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalAlumno()"><i class="bi bi-plus-lg"></i>Agregar Alumno</button>
+      <input type="text" id="q-alumnos" placeholder="🔍 Buscar por nombre..." oninput="renderAlumnos()" style="width:210px">
+      <select id="f-turno-alu" onchange="renderAlumnos()" style="width:130px">
+        <option value="">Todos los turnos</option>
+        <option>Mañana</option><option>Tarde</option><option>Tiempo Completo</option>
+      </select>
+      <select id="f-estado-alu" onchange="renderAlumnos()" style="width:140px">
+        <option value="">Todos los estados</option>
+        <option>Activo</option><option>Egresado</option><option>Trasladado</option><option>Retirado</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-alumnos"></div><div id="pg-alumnos"></div></div>
+  </div>
+
+  <!-- FAMILIAS -->
+  <div id="page-familias" class="page">
+    <div class="page-title"><i class="bi bi-handshake-fill"></i>Compromisos y Acuerdos con Familias <span id="cnt-familias" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalFamilia()"><i class="bi bi-plus-lg"></i>Agregar Compromiso</button>
+      <input type="text" id="q-familias" placeholder="🔍 Buscar alumno..." oninput="renderFamilias()" style="width:210px">
+      <select id="f-estado-fam" onchange="renderFamilias()" style="width:150px">
+        <option value="">Todos los estados</option>
+        <option>Pendiente</option><option>Cumplido</option><option>Reprogramado</option><option>Incumplido</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-familias"></div><div id="pg-familias"></div></div>
+  </div>
+
+  <!-- DOCUMENTOS MEC -->
+  <div id="page-documentos" class="page">
+    <div class="page-title"><i class="bi bi-file-earmark-text-fill"></i>Documentos y Plazos — MEC Paraguay <span id="cnt-docs" class="badge-norm"></span></div>
+    <div class="norm-box" style="margin-bottom:12px">
+      <strong><i class="bi bi-info-circle me-1"></i>Base normativa para estos documentos</strong>
+      Ley 5136/2013 Art. 15-16 &nbsp;|&nbsp; Res. MEC 29.664/2012 Arts. 8 y 12 &nbsp;|&nbsp; Decreto 1.350/2019 Arts. 22 y 30 &nbsp;|&nbsp; Res. 29.451/2010
+    </div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalDocumento()"><i class="bi bi-plus-lg"></i>Agregar Documento</button>
+      <input type="text" id="q-docs" placeholder="🔍 Buscar documento..." oninput="renderDocumentos()" style="width:230px">
+      <select id="f-estado-docs" onchange="renderDocumentos()" style="width:160px">
+        <option value="">Todos los estados</option>
+        <option>Pendiente</option><option>En preparación</option><option>Presentado</option><option>Aprobado</option><option>Observado</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-documentos"></div><div id="pg-documentos"></div></div>
+  </div>
+
+  <!-- SEGUIMIENTO -->
+  <div id="page-seguimiento" class="page">
+    <div class="page-title"><i class="bi bi-graph-up-arrow"></i>Seguimiento Académico Individual <span id="cnt-seg" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalSeguimiento()"><i class="bi bi-plus-lg"></i>Agregar Registro</button>
+      <input type="text" id="q-seg" placeholder="🔍 Buscar alumno..." oninput="renderSeguimiento()" style="width:210px">
+      <select id="f-trim" onchange="renderSeguimiento()" style="width:155px">
+        <option value="">Todos los períodos</option>
+        <option>1er Trimestre</option><option>2do Trimestre</option><option>3er Trimestre</option><option>Semestral</option><option>Anual</option>
+      </select>
+      <select id="f-materia" onchange="renderSeguimiento()" style="width:160px">
+        <option value="">Todas las materias</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-seguimiento"></div><div id="pg-seguimiento"></div></div>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div id="page-calendario" class="page">
+    <div class="page-title"><i class="bi bi-calendar3"></i>Calendario Anual 2026 — Educación Inclusiva <span id="cnt-cal" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalCalendario()"><i class="bi bi-plus-lg"></i>Agregar Evento</button>
+      <select id="f-mes-cal" onchange="renderCalendario()" style="width:140px">
+        <option value="">Todos los meses</option>
+        <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+        <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+        <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+      </select>
+      <select id="f-estado-cal" onchange="renderCalendario()" style="width:150px">
+        <option value="">Todos los estados</option>
+        <option>Pendiente</option><option>En proceso</option><option>Completado</option><option>Reprogramado</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-calendario"></div><div id="pg-calendario"></div></div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div id="page-historial" class="page">
+    <div class="page-title"><i class="bi bi-clock-history"></i>Historial de Actividad <span id="cnt-historial" class="badge-norm"></span></div>
+    <div class="norm-box">Registro de cambios sincronizados con el servidor. Incluye altas, ediciones, eliminaciones y sincronizaciones por sección.</div>
+    <div class="table-card"><div id="table-historial"></div></div>
+  </div>
+
+</div>
+
+<!-- Búsqueda global -->
+<div id="search-overlay" onclick="if(event.target===this)cerrarBusqueda()">
+  <div class="search-panel">
+    <input id="global-search-input" type="text" placeholder="Buscar alumnos, documentos, compromisos… (Ctrl+K)" oninput="ejecutarBusqueda()">
+    <div id="search-results"><div class="search-hint">Escribí al menos 2 caracteres para buscar en todo el sistema</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL UNIVERSAL ═══════════════ -->
+<div class="modal fade" id="mainModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary btn-sm" id="modalSave" style="background:var(--azul-med);border-color:var(--azul-med)">
+          <i class="bi bi-floppy"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+// ════════════════════════════════════════════════
+// DATOS EN MEMORIA + GUARDADO EN SERVIDOR
+// ════════════════════════════════════════════════
+const _mem = { alumnos:[], familias:[], documentos:[], seguimiento:[], calendario:[] };
+
+const DB = {
+  get:   k => _mem[k] || [],
+  add(k, item) {
+    (_mem[k] = _mem[k]||[]).push({...item, id:Date.now()+'_'+Math.random().toString(36).slice(2,7)});
+    autoSave();
+  },
+  update(k, id, item) {
+    const d=_mem[k]||[]; const i=d.findIndex(x=>x.id==id);
+    if (i>=0) { d[i]={...item,id}; } autoSave();
+  },
+  del(k, id) { _mem[k]=(_mem[k]||[]).filter(x=>x.id!=id); autoSave(); },
+  byId(k, id) { return (_mem[k]||[]).find(x=>x.id==id); },
+};
+
+// ── API calls al servidor ──────────────────────────────────────
+let _saveTimer  = null;
+let _saveStatus = 'idle';
+
+function getPassword() { return sessionStorage.getItem('app_pw') || ''; }
+
+function updateFileStatus() {
+  const elNom  = document.getElementById('file-status-name');
+  const elIcon = document.getElementById('file-status-icon');
+  if (!elNom) return;
+  if (_saveStatus === 'saving') {
+    elNom.textContent = 'Guardando…';
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-arrow-repeat spin" style="color:#7fb3d9"></i>';
+  } else if (_saveStatus === 'error') {
+    elNom.textContent = 'Error al guardar';
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-x-circle" style="color:#f77"></i>';
+  } else if (_saveStatus === 'ok') {
+    elNom.textContent = 'Guardado en servidor ✓';
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-cloud-check-fill" style="color:#6dbf67"></i>';
+  } else {
+    elNom.textContent = 'Conectando…';
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-cloud" style="color:#999"></i>';
+  }
+}
+
+async function autoSave() {
+  _saveStatus = 'saving';
+  updateFileStatus();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async () => {
+    try {
+      const r = await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'x-app-password': getPassword() },
+        body: JSON.stringify(_mem),
+      });
+      _saveStatus = r.ok ? 'ok' : 'error';
+    } catch(e) {
+      _saveStatus = 'error';
+      console.error('Error al guardar:', e);
+    }
+    updateFileStatus();
+  }, 400);
+}
+
+async function cargarDesdeServidor(password) {
+  try {
+    const r = await fetch('/api/data', {
+      headers: { 'x-app-password': password }
+    });
+    if (!r.ok) return false;
+    const json = await r.json();
+    Object.assign(_mem, {
+      alumnos:     json.data?.alumnos     || [],
+      familias:    json.data?.familias    || [],
+      documentos:  json.data?.documentos  || [],
+      seguimiento: json.data?.seguimiento || [],
+      calendario:  json.data?.calendario  || [],
+    });
+    return true;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
+async function arrancarConClave(clave) {
+  const msg = document.getElementById('startup-msg');
+  if (msg) { msg.style.color='#666'; msg.textContent = 'Conectando al servidor…'; }
+  const ok = await cargarDesdeServidor(clave);
+  if (ok) {
+    sessionStorage.setItem('app_pw', clave);
+    preload();
+    _saveStatus = 'ok';
+    updateFileStatus();
+    renderDashboard();
+    const ov = document.getElementById('startup-overlay');
+    if (ov) ov.remove();
+  } else {
+    if (msg) { msg.style.color='#C00000'; msg.textContent = '❌ Clave incorrecta o servidor no disponible. Intentá de nuevo.'; }
+    document.getElementById('input-clave')?.focus();
+  }
+}
+
+// ════════════════════════════════════════════════
+// DATE & ALERT UTILS
+// ════════════════════════════════════════════════
+function daysLeft(s) {
+  if (!s) return null;
+  const t=new Date(); t.setHours(0,0,0,0);
+  const d=new Date(s); d.setHours(0,0,0,0);
+  return Math.round((d-t)/864e5);
+}
+
+function alertBadge(days) {
+  if (days===null) return '<span class="bd-nf">Sin fecha</span>';
+  if (days<0)   return `<span class="bd-vencido">🔴 VENCIDO (${Math.abs(days)}d)</span>`;
+  if (days<=15) return `<span class="bd-urgente">⚠️ ${days} días</span>`;
+  if (days<=30) return `<span class="bd-proximo">🟡 ${days} días</span>`;
+  return `<span class="bd-ok">🟢 ${days} días</span>`;
+}
+
+function rowCls(days) {
+  if (days===null) return '';
+  if (days<0)   return 'row-vencido';
+  if (days<=15) return 'row-urgente';
+  if (days<=30) return 'row-proximo';
+  return '';
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`;
+}
+
+function today() { return new Date().toISOString().slice(0,10); }
+
+function pctBar(val) {
+  const n = parseFloat(val)||0;
+  const col = n>=70?'#375623':n>=50?'#BF9000':'#C00000';
+  return `<div style="display:inline-flex;align-items:center;gap:5px">
+    <strong style="color:${col}">${n}%</strong>
+    <div class="pct-bar"><div class="pct-bar-fill" style="width:${n}%;background:${col}"></div></div>
+  </div>`;
+}
+
+function estadoBadge(est, map) {
+  const m = map || {Activo:'success',Egresado:'secondary',Trasladado:'warning text-dark',Retirado:'danger',
+    Pendiente:'warning text-dark',Cumplido:'success',Reprogramado:'info text-dark',Incumplido:'danger',
+    Completado:'success','En proceso':'info text-dark','En preparación':'info text-dark',
+    Presentado:'primary',Aprobado:'success',Observado:'danger'};
+  const cl = m[est] || 'secondary';
+  return `<span class="badge bg-${cl}">${est||'—'}</span>`;
+}
+
+// ════════════════════════════════════════════════
+// NAVEGACIÓN
+// ════════════════════════════════════════════════
+const renders = {dashboard:renderDashboard,alumnos:renderAlumnos,familias:renderFamilias,documentos:renderDocumentos,seguimiento:renderSeguimiento,calendario:renderCalendario,historial:renderHistorial};
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#sidebar a.nav-link').forEach(l=>l.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('#sidebar a.nav-link').forEach(l=>{
+    if (l.getAttribute('onclick')?.includes("'"+name+"'")) l.classList.add('active');
+  });
+  if (renders[name]) renders[name]();
+}
+
+// Navega a una sección y aplica un filtro antes de renderizar
+function irAFiltro(page, filterId, valor, renderFn) {
+  showPage(page);
+  // Pequeño delay para que el DOM de la página destino esté activo
+  setTimeout(() => {
+    const el = document.getElementById(filterId);
+    if (el) el.value = valor;
+    renderFn();
+  }, 30);
+}
+
+// Para la tarjeta de alertas: queda en dashboard y hace scroll + destaca la tabla
+function verAlertas() {
+  const el = document.getElementById('alert-table');
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Quitar clase previa y re-agregar para reiniciar la animación
+  el.classList.remove('flash-alert');
+  void el.offsetWidth; // reflow
+  el.classList.add('flash-alert');
+  el.addEventListener('animationend', () => el.classList.remove('flash-alert'), { once: true });
+}
+
+// ════════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════════
+let _bsModal;
+function getModal() { if(!_bsModal) _bsModal=new bootstrap.Modal(document.getElementById('mainModal')); return _bsModal; }
+function openModal(title, html, onSave) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalSave').onclick = onSave;
+  getModal().show();
+}
+function closeModal() { getModal().hide(); }
+function fld(id) { return (document.getElementById(id)?.value||'').trim(); }
+
+// ════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════
+function renderDashboard() {
+  document.getElementById('dash-fecha').textContent = new Date().toLocaleDateString('es-PY',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  const alumnos   = DB.get('alumnos');
+  const familias  = DB.get('familias');
+  const docs      = DB.get('documentos');
+  const cal       = DB.get('calendario');
+
+  const totalAlu   = alumnos.filter(a=>a.estado==='Activo'||!a.estado).length;
+  const compPend   = familias.filter(f=>f.estado==='Pendiente').length;
+  const docsPend   = docs.filter(d=>d.estado==='Pendiente'||d.estado==='En preparación').length;
+
+  const allItems = [
+    ...familias.filter(f=>f.fechaLimite).map(f=>({tipo:'🤝 Familia',desc:(f.acuerdo||'—').slice(0,65),alumno:f.alumno||'—',fecha:f.fechaLimite,estado:f.estado,resp:f.responsable||'—'})),
+    ...docs.filter(d=>d.fechaLimite).map(d=>({tipo:'📄 MEC',desc:(d.documento||'—').slice(0,65),alumno:d.alumnos||'Todos',fecha:d.fechaLimite,estado:d.estado,resp:d.responsable||'—'})),
+    ...cal.filter(c=>c.fecha).map(c=>({tipo:'📅 Calendario',desc:(c.accion||'—').slice(0,65),alumno:c.destinatario||'—',fecha:c.fecha,estado:c.estado,resp:'—'})),
+  ].map(x=>({...x,days:daysLeft(x.fecha)})).filter(x=>x.days!==null&&x.days<=30).sort((a,b)=>a.days-b.days);
+
+  const alertas = allItems.length;
+
+  const statsData = [
+    {num:totalAlu, lbl:'Alumnos activos',           icon:'bi-people-fill',              color:'#2E75B6', hint:'Ver listado de alumnos activos →',  fn:`irAFiltro('alumnos','f-estado-alu','Activo',renderAlumnos)`},
+    {num:compPend, lbl:'Compromisos pendientes',     icon:'bi-handshake-fill',            color:'#C55A11', hint:'Ver compromisos pendientes →',      fn:`irAFiltro('familias','f-estado-fam','Pendiente',renderFamilias)`},
+    {num:docsPend, lbl:'Documentos MEC pendientes',  icon:'bi-file-earmark-text-fill',    color:'#C00000', hint:'Ver documentos pendientes →',        fn:`irAFiltro('documentos','f-estado-docs','Pendiente',renderDocumentos)`},
+    {num:alertas,  lbl:'Alertas (próx. 30 días)', icon:'bi-exclamation-triangle-fill', color:alertas>0?'#C00000':'#375623', hint:'Ver detalle de alertas ↓', fn:`verAlertas()`},
+  ];
+
+  document.getElementById('stats-row').innerHTML = statsData.map(s=>`
+    <div class="col-6 col-xl-3" onclick="${s.fn}" style="cursor:pointer">
+      <div class="stat-card" style="border-left-color:${s.color}">
+        <div class="d-flex align-items-center gap-3">
+          <i class="bi ${s.icon}" style="color:${s.color}"></i>
+          <div style="flex:1">
+            <div class="num" style="color:${s.color}">${s.num}</div>
+            <div class="lbl">${s.lbl}</div>
+            <div class="hint"><i class="bi bi-arrow-right-circle me-1"></i>${s.hint}</div>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  if (!allItems.length) {
+    document.getElementById('alert-table').innerHTML = `
+      <div class="empty-state"><i class="bi bi-check-circle-fill text-success"></i>
+        No hay vencimientos en los próximos 30 días.<br><small>El sistema revisará automáticamente al reabrir.</small></div>`;
+    return;
+  }
+
+  document.getElementById('alert-table').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm" style="font-size:12px">
+      <thead><tr><th>Tipo</th><th>Descripción</th><th>Alumno / Dest.</th><th>Fecha Límite</th><th>Alerta</th><th>Estado</th><th>Responsable</th></tr></thead>
+      <tbody>${allItems.map(x=>`<tr class="${rowCls(x.days)}">
+        <td style="white-space:nowrap">${x.tipo}</td>
+        <td>${x.desc}</td>
+        <td>${x.alumno}</td>
+        <td style="white-space:nowrap">${fmtDate(x.fecha)}</td>
+        <td>${alertBadge(x.days)}</td>
+        <td>${estadoBadge(x.estado)}</td>
+        <td>${x.resp}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+// ════════════════════════════════════════════════
+// ALUMNOS
+// ════════════════════════════════════════════════
+function renderAlumnos() {
+  const q   = (document.getElementById('q-alumnos')?.value||'').toLowerCase();
+  const est = document.getElementById('f-estado-alu')?.value||'';
+  const tur = document.getElementById('f-turno-alu')?.value||'';
+  const filtered = DB.get('alumnos').filter(a=>
+    (!q   || (a.apellidoNombre||'').toLowerCase().includes(q)) &&
+    (!est || a.estado===est) &&
+    (!tur || a.turno===tur)
+  );
+  const pg = paginate(filtered, _pages?.alumnos || 1, PAGE_SIZE || 25);
+  const data = pg.items;
+  document.getElementById('cnt-alumnos').textContent = filtered.length + ' alumnos';
+
+  if (!filtered.length) {
+    document.getElementById('table-alumnos').innerHTML = `<div class="empty-state"><i class="bi bi-people"></i>No hay alumnos registrados.<br><small>Usá el botón "Agregar Alumno" para comenzar.</small></div>`;
+    document.getElementById('pg-alumnos').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('table-alumnos').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Apellido y Nombre</th><th>CI</th><th>F. Nacim.</th>
+        <th>Curso</th><th>Turno</th><th>Necesidad / Diagnóstico</th>
+        <th>Tipo Adecuación</th><th>Apoyo</th><th>F. Ingreso</th>
+        <th>Docente Resp.</th><th>Tel. Familia</th><th>Estado</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((a,i)=>`<tr>
+        <td style="color:#888">${(pg.page - 1) * (PAGE_SIZE || 25) + i + 1}</td>
+        <td><strong>${a.apellidoNombre||'—'}</strong></td>
+        <td>${a.ci||'—'}</td>
+        <td>${fmtDate(a.fechaNacim)}</td>
+        <td>${a.curso||'—'}</td>
+        <td>${a.turno||'—'}</td>
+        <td>${(a.necesidad||'—').slice(0,45)}</td>
+        <td><small>${(a.tipoAdecuacion||'—').replace('Adecuación ','Adec. ')}</small></td>
+        <td><small>${a.gradoApoyo||'—'}</small></td>
+        <td>${fmtDate(a.fechaIngreso)}</td>
+        <td><small>${a.docente||'—'}</small></td>
+        <td>${a.telFamilia||'—'}</td>
+        <td>${estadoBadge(a.estado||'Activo')}</td>
+        <td class="text-nowrap">
+          <button class="btn-exp me-1" onclick="verExpediente('${a.id}')" title="Ver expediente"><i class="bi bi-folder2-open"></i></button>
+          <button class="btn-edit me-1" onclick="modalAlumno('${a.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('alumnos','${a.id}',renderAlumnos)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  renderPagination('pg-alumnos', 'alumnos', filtered.length, 'renderAlumnos');
+}
+
+function modalAlumno(id) {
+  const a = id ? DB.byId('alumnos',id) : {};
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Alumno':'Agregar Alumno Inclusivo', `
+  <div class="row g-2">
+    <div class="col-md-8"><label class="form-label">Apellido y Nombre *</label>
+      <input class="form-control" id="f_nom" value="${a.apellidoNombre||''}"></div>
+    <div class="col-md-4"><label class="form-label">CI / Documento</label>
+      <input class="form-control" id="f_ci" value="${a.ci||''}"></div>
+    <div class="col-md-4"><label class="form-label">Fecha de Nacimiento</label>
+      <input class="form-control" type="date" id="f_fnac" value="${a.fechaNacim||''}"></div>
+    <div class="col-md-4"><label class="form-label">Curso / Grado</label>
+      <input class="form-control" id="f_curso" value="${a.curso||''}" placeholder="Ej: 1° Año, 3° Grado"></div>
+    <div class="col-md-4"><label class="form-label">Turno</label>
+      <select class="form-select" id="f_turno"><option value=""></option>
+        ${opts(['Mañana','Tarde','Tiempo Completo'],a.turno)}</select></div>
+    <div class="col-12"><label class="form-label">Necesidad / Diagnóstico</label>
+      <input class="form-control" id="f_nec" value="${a.necesidad||''}" placeholder="Ej: Discapacidad intelectual leve, TEA, hipoacusia..."></div>
+    <div class="col-md-7"><label class="form-label">Tipo de Adecuación</label>
+      <select class="form-select" id="f_adec"><option value=""></option>
+        ${opts(['Adecuación de Acceso','Adecuación Curricular No Significativa','Adecuación Curricular Significativa'],a.tipoAdecuacion)}</select></div>
+    <div class="col-md-5"><label class="form-label">Grado de Apoyo</label>
+      <select class="form-select" id="f_apoyo"><option value=""></option>
+        ${opts(['Leve','Moderado','Intenso'],a.gradoApoyo)}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha de Ingreso</label>
+      <input class="form-control" type="date" id="f_fing" value="${a.fechaIngreso||''}"></div>
+    <div class="col-md-8"><label class="form-label">Docente Responsable</label>
+      <input class="form-control" id="f_doc" value="${a.docente||''}"></div>
+    <div class="col-md-4"><label class="form-label">Teléfono Familia</label>
+      <input class="form-control" id="f_tel" value="${a.telFamilia||''}"></div>
+    <div class="col-md-5"><label class="form-label">Responsable MEC</label>
+      <input class="form-control" id="f_rmec" value="${a.responsableMEC||'Lic. Rodrigo Godoy'}"></div>
+    <div class="col-md-3"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Activo','Egresado','Trasladado','Retirado'],a.estado||'Activo')}</select></div>
+    <div class="col-12"><label class="form-label">Observaciones</label>
+      <textarea class="form-control" id="f_obs" rows="2">${a.observaciones||''}</textarea></div>
+  </div>`, ()=>{
+    const nombre=fld('f_nom'); if(!nombre){alert('El nombre es requerido.');return;}
+    DB[id?'update':'add']('alumnos', ...(id?[id]:[]), {
+      apellidoNombre:nombre,ci:fld('f_ci'),fechaNacim:fld('f_fnac'),curso:fld('f_curso'),
+      turno:fld('f_turno'),necesidad:fld('f_nec'),tipoAdecuacion:fld('f_adec'),
+      gradoApoyo:fld('f_apoyo'),fechaIngreso:fld('f_fing'),docente:fld('f_doc'),
+      telFamilia:fld('f_tel'),responsableMEC:fld('f_rmec'),estado:fld('f_est')||'Activo',
+      observaciones:fld('f_obs'),
+    });
+    closeModal(); renderAlumnos();
+  });
+}
+
+// helper unificado de add/update
+function saveItem(collection, id, item) {
+  if (id) DB.update(collection, id, item);
+  else DB.add(collection, item);
+}
+
+// ════════════════════════════════════════════════
+// FAMILIAS
+// ════════════════════════════════════════════════
+function renderFamilias() {
+  const q   = (document.getElementById('q-familias')?.value||'').toLowerCase();
+  const est = document.getElementById('f-estado-fam')?.value||'';
+  const filtered = DB.get('familias').filter(f=>
+    (!q   || (f.alumno||'').toLowerCase().includes(q)) &&
+    (!est || f.estado===est)
+  ).map(f=>({...f,days:daysLeft(f.fechaLimite)}))
+   .sort((a,b)=>(a.days??9999)-(b.days??9999));
+
+  const pg = paginate(filtered, _pages?.familias || 1, PAGE_SIZE || 25);
+  const data = pg.items;
+  document.getElementById('cnt-familias').textContent = filtered.length + ' registros';
+
+  if (!filtered.length) {
+    document.getElementById('table-familias').innerHTML = `<div class="empty-state"><i class="bi bi-handshake"></i>No hay compromisos registrados.</div>`;
+    document.getElementById('pg-familias').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('table-familias').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Alumno</th><th>F. Reunión</th><th>Compromiso / Acuerdo</th>
+        <th>Estado</th><th>Fecha Límite</th><th>Días Rest.</th>
+        <th>Próx. Reunión</th><th>Responsable</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((f,i)=>`<tr class="${rowCls(f.days)}">
+        <td style="color:#888">${i+1}</td>
+        <td><strong>${f.alumno||'—'}</strong></td>
+        <td style="white-space:nowrap">${fmtDate(f.fechaReunion)}</td>
+        <td style="max-width:280px">${(f.acuerdo||'—').slice(0,90)}${(f.acuerdo||'').length>90?'…':''}</td>
+        <td>${estadoBadge(f.estado)}</td>
+        <td style="white-space:nowrap">${fmtDate(f.fechaLimite)}</td>
+        <td>${alertBadge(f.days)}</td>
+        <td style="white-space:nowrap">${fmtDate(f.proximaReunion)}</td>
+        <td><small>${f.responsable||'—'}</small></td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalFamilia('${f.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('familias','${f.id}',renderFamilias)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  renderPagination('pg-familias', 'familias', filtered.length, 'renderFamilias');
+}
+
+function modalFamilia(id) {
+  const f = id ? DB.byId('familias',id) : {};
+  const alumnos = DB.get('alumnos').map(a=>a.apellidoNombre).filter(Boolean);
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Compromiso':'Agregar Compromiso con Familia', `
+  <div class="row g-2">
+    <div class="col-12"><label class="form-label">Alumno *</label>
+      <input class="form-control" id="f_alu" list="dl-alu-fam" value="${f.alumno||''}" placeholder="Nombre del alumno">
+      <datalist id="dl-alu-fam">${alumnos.map(n=>`<option value="${n}">`).join('')}</datalist></div>
+    <div class="col-md-4"><label class="form-label">Fecha de Reunión</label>
+      <input class="form-control" type="date" id="f_freu" value="${f.fechaReunion||today()}"></div>
+    <div class="col-md-8"><label class="form-label">Participantes</label>
+      <input class="form-control" id="f_part" value="${f.participantes||''}" placeholder="Quiénes asistieron"></div>
+    <div class="col-12"><label class="form-label">Acuerdo / Compromiso *</label>
+      <textarea class="form-control" id="f_acu" rows="3">${f.acuerdo||''}</textarea></div>
+    <div class="col-md-4"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Pendiente','Cumplido','Reprogramado','Incumplido'],f.estado||'Pendiente')}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha Límite</label>
+      <input class="form-control" type="date" id="f_flim" value="${f.fechaLimite||''}"></div>
+    <div class="col-md-4"><label class="form-label">Próxima Reunión</label>
+      <input class="form-control" type="date" id="f_fpro" value="${f.proximaReunion||''}"></div>
+    <div class="col-12"><label class="form-label">Seguimiento / Notas</label>
+      <textarea class="form-control" id="f_seg" rows="2">${f.seguimiento||''}</textarea></div>
+    <div class="col-md-6"><label class="form-label">Responsable</label>
+      <input class="form-control" id="f_res" value="${f.responsable||'Lic. Rodrigo Godoy'}"></div>
+    <div class="col-md-6"><label class="form-label">Firma / Constancia</label>
+      <input class="form-control" id="f_fir" value="${f.firma||''}"></div>
+  </div>`, ()=>{
+    const alu=fld('f_alu'),acu=fld('f_acu');
+    if(!alu||!acu){alert('Alumno y compromiso son requeridos.');return;}
+    saveItem('familias',id,{alumno:alu,fechaReunion:fld('f_freu'),participantes:fld('f_part'),
+      acuerdo:acu,estado:fld('f_est')||'Pendiente',fechaLimite:fld('f_flim'),
+      proximaReunion:fld('f_fpro'),seguimiento:fld('f_seg'),responsable:fld('f_res'),firma:fld('f_fir')});
+    closeModal(); renderFamilias();
+  });
+}
+
+// ════════════════════════════════════════════════
+// DOCUMENTOS MEC
+// ════════════════════════════════════════════════
+function renderDocumentos() {
+  const q   = (document.getElementById('q-docs')?.value||'').toLowerCase();
+  const est = document.getElementById('f-estado-docs')?.value||'';
+  const filtered = DB.get('documentos').filter(d=>
+    (!q   || (d.documento||'').toLowerCase().includes(q)) &&
+    (!est || d.estado===est)
+  ).map(d=>({...d,days:daysLeft(d.fechaLimite)}))
+   .sort((a,b)=>(a.days??9999)-(b.days??9999));
+
+  const pg = paginate(filtered, _pages?.documentos || 1, PAGE_SIZE || 25);
+  const data = pg.items;
+  document.getElementById('cnt-docs').textContent = filtered.length + ' documentos';
+
+  if (!filtered.length) {
+    document.getElementById('table-documentos').innerHTML = `<div class="empty-state"><i class="bi bi-file-earmark-text"></i>No hay documentos registrados.</div>`;
+    document.getElementById('pg-documentos').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('table-documentos').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Documento / Trámite</th><th>Alumno(s)</th><th>Base Legal</th>
+        <th>Estado</th><th>Fecha Límite</th><th>Días Rest.</th>
+        <th>Dónde se presenta</th><th>Responsable</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((d,i)=>`<tr class="${rowCls(d.days)}">
+        <td style="color:#888">${i+1}</td>
+        <td><strong><small>${(d.documento||'—').slice(0,60)}</small></strong></td>
+        <td><small>${(d.alumnos||'—').slice(0,40)}</small></td>
+        <td><small style="color:#555">${(d.baseLegal||'—').slice(0,40)}</small></td>
+        <td>${estadoBadge(d.estado)}</td>
+        <td style="white-space:nowrap">${fmtDate(d.fechaLimite)}</td>
+        <td>${alertBadge(d.days)}</td>
+        <td><small>${(d.dondePresentar||'—').slice(0,45)}</small></td>
+        <td><small>${d.responsable||'—'}</small></td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalDocumento('${d.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('documentos','${d.id}',renderDocumentos)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  renderPagination('pg-documentos', 'documentos', filtered.length, 'renderDocumentos');
+}
+
+function modalDocumento(id) {
+  const d = id ? DB.byId('documentos',id) : {};
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Documento MEC':'Agregar Documento MEC', `
+  <div class="row g-2">
+    <div class="col-12"><label class="form-label">Documento / Trámite *</label>
+      <input class="form-control" id="f_doc" value="${d.documento||''}"></div>
+    <div class="col-md-6"><label class="form-label">Alumno(s)</label>
+      <input class="form-control" id="f_alu" value="${d.alumnos||'Todos los alumnos inclusivos'}"></div>
+    <div class="col-md-6"><label class="form-label">Base Legal</label>
+      <input class="form-control" id="f_leg" value="${d.baseLegal||''}" placeholder="Ej: Ley 5136/2013 Art. 15"></div>
+    <div class="col-md-4"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Pendiente','En preparación','Presentado','Aprobado','Observado'],d.estado||'Pendiente')}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha Límite</label>
+      <input class="form-control" type="date" id="f_fecha" value="${d.fechaLimite||''}"></div>
+    <div class="col-md-4"><label class="form-label">Responsable</label>
+      <input class="form-control" id="f_res" value="${d.responsable||'Lic. Rodrigo Godoy'}"></div>
+    <div class="col-12"><label class="form-label">Dónde se presenta</label>
+      <input class="form-control" id="f_donde" value="${d.dondePresentar||''}"></div>
+    <div class="col-12"><label class="form-label">Observaciones</label>
+      <textarea class="form-control" id="f_obs" rows="2">${d.observaciones||''}</textarea></div>
+  </div>`, ()=>{
+    const doc=fld('f_doc'); if(!doc){alert('El nombre del documento es requerido.');return;}
+    saveItem('documentos',id,{documento:doc,alumnos:fld('f_alu'),baseLegal:fld('f_leg'),
+      estado:fld('f_est')||'Pendiente',fechaLimite:fld('f_fecha'),responsable:fld('f_res'),
+      dondePresentar:fld('f_donde'),observaciones:fld('f_obs')});
+    closeModal(); renderDocumentos();
+  });
+}
+
+// ════════════════════════════════════════════════
+// SEGUIMIENTO ACADÉMICO
+// ════════════════════════════════════════════════
+function renderSeguimiento() {
+  const q    = (document.getElementById('q-seg')?.value||'').toLowerCase();
+  const trim = document.getElementById('f-trim')?.value||'';
+  const mat  = document.getElementById('f-materia')?.value||'';
+  const filtered = DB.get('seguimiento').filter(s=>
+    (!q    || (s.alumno||'').toLowerCase().includes(q)) &&
+    (!trim || s.trimestre===trim) &&
+    (!mat  || s.materia===mat)
+  );
+
+  const pg = paginate(filtered, _pages?.seguimiento || 1, PAGE_SIZE || 25);
+  const data = pg.items;
+
+  // Populate materias filter
+  const materias = [...new Set(DB.get('seguimiento').map(s=>s.materia).filter(Boolean))].sort();
+  const selMat = document.getElementById('f-materia');
+  if (selMat) {
+    const cur = selMat.value;
+    selMat.innerHTML = '<option value="">Todas las materias</option>' +
+      materias.map(m=>`<option${m===cur?' selected':''}>${m}</option>`).join('');
+  }
+
+  document.getElementById('cnt-seg').textContent = filtered.length + ' registros';
+
+  if (!filtered.length) {
+    document.getElementById('table-seguimiento').innerHTML = `<div class="empty-state"><i class="bi bi-graph-up"></i>No hay registros de seguimiento.</div>`;
+    document.getElementById('pg-seguimiento').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('table-seguimiento').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>CI</th><th>Alumno</th><th>Materia</th><th>Período</th>
+        <th>Tipo Adecuación</th><th>Objetivo</th><th>Resultado</th>
+        <th>% Logro</th><th>Próx. Paso</th><th>Fecha</th><th>Docente</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((s,i)=>`<tr>
+        <td style="color:#888">${i+1}</td>
+        <td><small style="font-family:monospace;color:#555">${s.ci||'—'}</small></td>
+        <td><strong>${s.alumno||'—'}</strong></td>
+        <td><small>${s.materia||'—'}</small></td>
+        <td><small>${s.trimestre||'—'}</small></td>
+        <td><small style="color:#375623;font-weight:600">${(s.tipoAdecuacion||'—').replace('Adecuación ','Adec. ')}</small></td>
+        <td style="max-width:140px"><small>${(s.objetivo||'—').slice(0,60)}${(s.objetivo||'').length>60?'…':''}</small></td>
+        <td style="max-width:120px"><small>${(s.resultado||'—').slice(0,55)}${(s.resultado||'').length>55?'…':''}</small></td>
+        <td>${pctBar(s.pctLogro)}</td>
+        <td style="max-width:120px"><small>${(s.proximoPaso||'—').slice(0,55)}${(s.proximoPaso||'').length>55?'…':''}</small></td>
+        <td style="white-space:nowrap"><small>${fmtDate(s.fechaRegistro)}</small></td>
+        <td><small>${s.docente||'—'}</small></td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalSeguimiento('${s.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('seguimiento','${s.id}',renderSeguimiento)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  renderPagination('pg-seguimiento', 'seguimiento', filtered.length, 'renderSeguimiento');
+}
+
+// Busca alumno por CI
+function autoFillAlumno() {
+  const ci = (document.getElementById('f_ci')?.value||'').trim();
+  const elNom  = document.getElementById('f_alu');
+  const elAdec = document.getElementById('f_adec');
+  const elMsg  = document.getElementById('f_ci_msg');
+  if (!ci) { elNom.value=''; elAdec.value=''; elAdec.style.background='#f8f9fa'; if(elMsg) elMsg.textContent=''; return; }
+  const found = DB.get('alumnos').find(a=>(a.ci||'').trim()===ci);
+  if (found) {
+    elNom.value  = found.apellidoNombre || '';
+    elAdec.value = found.tipoAdecuacion || '(No registrado en Alumnos)';
+    elAdec.style.background = found.tipoAdecuacion ? '#e2efda' : '#fff9cc';
+    elAdec.style.color      = found.tipoAdecuacion ? '#375623' : '#7F6000';
+    elAdec.style.fontWeight = '600';
+    if (elMsg) { elMsg.textContent = '✔ Alumno encontrado'; elMsg.style.color='#375623'; }
+  } else {
+    elNom.value  = '';
+    elAdec.value = '';
+    elAdec.style.background = '#f8f9fa';
+    if (elMsg) { elMsg.textContent = '⚠ CI no encontrada en Alumnos Inclusivos'; elMsg.style.color='#C55A11'; }
+  }
+}
+
+function modalSeguimiento(id) {
+  const s    = id ? DB.byId('seguimiento',id) : {};
+  const alus = DB.get('alumnos').filter(a=>a.ci);
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+
+  openModal(id?'Editar Registro de Seguimiento':'Agregar Registro de Seguimiento', `
+  <div class="row g-2">
+
+    <div class="col-md-4">
+      <label class="form-label">CI / Cédula de Identidad *</label>
+      <input class="form-control" id="f_ci" list="dl-ci-seg"
+             value="${s.ci||''}" placeholder="Ej: 4.123.456"
+             oninput="autoFillAlumno()">
+      <datalist id="dl-ci-seg">
+        ${alus.map(a=>`<option value="${a.ci}">${a.apellidoNombre||''}</option>`).join('')}
+      </datalist>
+      <div id="f_ci_msg" style="font-size:11px;margin-top:3px;min-height:14px"></div>
+    </div>
+
+    <div class="col-md-8">
+      <label class="form-label">Apellido y Nombre
+        <span style="font-size:10px;color:#2E75B6;font-weight:normal">— se completa automáticamente</span>
+      </label>
+      <input class="form-control" id="f_alu" value="${s.alumno||''}" readonly
+             style="background:#f0f4f8;color:#1F3864;font-weight:600"
+             placeholder="Se carga al ingresar la CI">
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Tipo de Adecuación
+        <span style="font-size:10px;color:#2E75B6;font-weight:normal">— se obtiene desde Alumnos Inclusivos</span>
+      </label>
+      <input class="form-control" id="f_adec" value="${s.tipoAdecuacion||''}" readonly
+             style="background:${s.tipoAdecuacion?'#e2efda':'#f8f9fa'};color:${s.tipoAdecuacion?'#375623':'#555'};font-weight:${s.tipoAdecuacion?'600':'normal'}"
+             placeholder="Se carga automáticamente al ingresar la CI">
+    </div>
+
+    <div class="col-md-5"><label class="form-label">Materia / Área</label>
+      <input class="form-control" id="f_mat" value="${s.materia||''}"></div>
+    <div class="col-md-4"><label class="form-label">Trimestre / Período</label>
+      <select class="form-select" id="f_tri"><option value=""></option>
+        ${opts(['1er Trimestre','2do Trimestre','3er Trimestre','Semestral','Anual'],s.trimestre)}</select></div>
+    <div class="col-md-3"><label class="form-label">% de Logro (0-100)</label>
+      <input class="form-control" type="number" min="0" max="100" id="f_pct" value="${s.pctLogro||''}"></div>
+
+    <div class="col-12"><label class="form-label">Objetivo Planteado</label>
+      <textarea class="form-control" id="f_obj" rows="2">${s.objetivo||''}</textarea></div>
+    <div class="col-12"><label class="form-label">Estrategia Utilizada</label>
+      <textarea class="form-control" id="f_est" rows="2">${s.estrategia||''}</textarea></div>
+    <div class="col-12"><label class="form-label">Resultado / Logro Observado</label>
+      <textarea class="form-control" id="f_res" rows="2">${s.resultado||''}</textarea></div>
+    <div class="col-12"><label class="form-label">Próximo Paso</label>
+      <textarea class="form-control" id="f_prox" rows="2">${s.proximoPaso||''}</textarea></div>
+    <div class="col-md-4"><label class="form-label">Fecha de Registro</label>
+      <input class="form-control" type="date" id="f_fecha" value="${s.fechaRegistro||today()}"></div>
+    <div class="col-md-8"><label class="form-label">Docente</label>
+      <input class="form-control" id="f_doc" value="${s.docente||''}"></div>
+  </div>`, ()=>{
+    const ci=fld('f_ci'), alu=fld('f_alu');
+    if (!ci)  { alert('La Cédula de Identidad es requerida.'); return; }
+    if (!alu) { alert('No se encontró el alumno con esa CI.\nVerificá que esté registrado en Alumnos Inclusivos con esa cédula.'); return; }
+    saveItem('seguimiento', id, {
+      ci, alumno:alu, materia:fld('f_mat'), trimestre:fld('f_tri'),
+      tipoAdecuacion:fld('f_adec'), pctLogro:fld('f_pct'),
+      objetivo:fld('f_obj'), estrategia:fld('f_est'), resultado:fld('f_res'),
+      proximoPaso:fld('f_prox'), fechaRegistro:fld('f_fecha'), docente:fld('f_doc'),
+    });
+    closeModal(); renderSeguimiento();
+  });
+}
+
+// ════════════════════════════════════════════════
+// CALENDARIO
+// ════════════════════════════════════════════════
+function renderCalendario() {
+  const mes  = document.getElementById('f-mes-cal')?.value||'';
+  const est  = document.getElementById('f-estado-cal')?.value||'';
+  const filtered = DB.get('calendario').filter(c=>
+    (!mes || c.mes===mes) && (!est || c.estado===est)
+  ).map(c=>({...c,days:daysLeft(c.fecha)}))
+   .sort((a,b)=>new Date(a.fecha||'9999-12-31')-new Date(b.fecha||'9999-12-31'));
+
+  const pg = paginate(filtered, _pages?.calendario || 1, PAGE_SIZE || 25);
+  const data = pg.items;
+  document.getElementById('cnt-cal').textContent = filtered.length + ' eventos';
+
+  if (!filtered.length) {
+    document.getElementById('table-calendario').innerHTML = `<div class="empty-state"><i class="bi bi-calendar3"></i>No hay eventos en el calendario.</div>`;
+    document.getElementById('pg-calendario').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('table-calendario').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Mes</th><th>Acción / Evento</th><th>Fecha</th>
+        <th>Normativa</th><th>Destinatario</th><th>Estado</th><th>Días Rest.</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((c,i)=>`<tr class="${rowCls(c.days)}">
+        <td style="color:#888">${i+1}</td>
+        <td><strong>${c.mes||'—'}</strong></td>
+        <td>${c.accion||'—'}</td>
+        <td style="white-space:nowrap">${fmtDate(c.fecha)}</td>
+        <td><small style="color:#555">${c.normativa||'—'}</small></td>
+        <td><small>${c.destinatario||'—'}</small></td>
+        <td>${estadoBadge(c.estado||'Pendiente')}</td>
+        <td>${alertBadge(c.days)}</td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalCalendario('${c.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('calendario','${c.id}',renderCalendario)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  renderPagination('pg-calendario', 'calendario', filtered.length, 'renderCalendario');
+}
+
+function modalCalendario(id) {
+  const c = id ? DB.byId('calendario',id) : {};
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Evento':'Agregar Evento al Calendario', `
+  <div class="row g-2">
+    <div class="col-md-4"><label class="form-label">Mes</label>
+      <select class="form-select" id="f_mes"><option value=""></option>
+        ${opts(meses,c.mes)}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha</label>
+      <input class="form-control" type="date" id="f_fecha" value="${c.fecha||''}"></div>
+    <div class="col-md-4"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Pendiente','En proceso','Completado','Reprogramado'],c.estado||'Pendiente')}</select></div>
+    <div class="col-12"><label class="form-label">Acción / Evento *</label>
+      <input class="form-control" id="f_acc" value="${c.accion||''}"></div>
+    <div class="col-md-6"><label class="form-label">Normativa</label>
+      <input class="form-control" id="f_nor" value="${c.normativa||''}" placeholder="Ej: Ley 5136/2013 Art. 15"></div>
+    <div class="col-md-6"><label class="form-label">Destinatario</label>
+      <input class="form-control" id="f_dest" value="${c.destinatario||''}"></div>
+  </div>`, ()=>{
+    const acc=fld('f_acc'); if(!acc){alert('La acción es requerida.');return;}
+    saveItem('calendario',id,{mes:fld('f_mes'),fecha:fld('f_fecha'),estado:fld('f_est')||'Pendiente',
+      accion:acc,normativa:fld('f_nor'),destinatario:fld('f_dest')});
+    closeModal(); renderCalendario();
+  });
+}
+
+// ════════════════════════════════════════════════
+// DELETE (universal)
+// ════════════════════════════════════════════════
+function delItem(collection, id, rerenderFn) {
+  if (confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) {
+    DB.del(collection, id);
+    rerenderFn();
+  }
+}
+
+// ════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ════════════════════════════════════════════════
+function exportarDatos() {
+  const data = {
+    alumnos:_mem.alumnos, familias:_mem.familias, documentos:_mem.documentos,
+    seguimiento:_mem.seguimiento, calendario:_mem.calendario,
+    exportado:new Date().toISOString(), version:'2.0',
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'backup_inclusivo_cerritos_'+today()+'.json';
+  a.click();
+}
+
+function importarDatos() {
+  if (!confirm('Importar datos reemplazará TODO el contenido actual. ¿Continuás?')) return;
+  document.getElementById('import-input').click();
+}
+
+function cargarArchivo(e) {
+  const file = e.target.files[0]; if (!file) return;
+  if (!confirm('Importar este archivo reemplazará TODOS los datos actuales en el servidor. ¿Confirmás?')) {
+    e.target.value=''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d.alumnos)     _mem.alumnos     = d.alumnos;
+      if (d.familias)    _mem.familias    = d.familias;
+      if (d.documentos)  _mem.documentos  = d.documentos;
+      if (d.seguimiento) _mem.seguimiento = d.seguimiento;
+      if (d.calendario)  _mem.calendario  = d.calendario;
+      autoSave();
+      alert('Datos importados y guardados en el servidor correctamente.');
+      renderDashboard();
+    } catch(err) { alert('Error al leer el archivo: '+err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ════════════════════════════════════════════════
+// PRELOAD (solo si están vacíos)
+// ════════════════════════════════════════════════
+function preload() {
+  if (!DB.get('documentos').length) {
+    [
+      {documento:'Planilla de matrícula inclusiva (Ficha de Registro)',alumnos:'Todos los alumnos nuevos inclusivos',baseLegal:'Res. MEC 29.664/2012 Art. 8',estado:'Pendiente',fechaLimite:'2026-03-15',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Sección de Educación Especial MEC / Supervisión'},
+      {documento:'Plan Educativo Individual (PEI) — Elaboración',alumnos:'Cada alumno inclusivo',baseLegal:'Ley 5136/2013 Art. 15 | Res. 29.664/2012',estado:'En preparación',fechaLimite:'2026-04-30',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional + copia Supervisión'},
+      {documento:'Informe de adecuaciones curriculares — 1er semestre',alumnos:'Todos los alumnos inclusivos',baseLegal:'Res. MEC 29.664/2012 Art. 12',estado:'Pendiente',fechaLimite:'2026-07-15',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa Departamental'},
+      {documento:'Informe de adecuaciones curriculares — 2do semestre',alumnos:'Todos los alumnos inclusivos',baseLegal:'Res. MEC 29.664/2012 Art. 12',estado:'Pendiente',fechaLimite:'2026-11-30',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa Departamental'},
+      {documento:'Evaluación psicopedagógica actualizada',alumnos:'Alumnos que requieren renovación',baseLegal:'Decreto 1.350/2019 Art. 22',estado:'Pendiente',fechaLimite:'2026-08-31',responsable:'Lic. Lea Cousirat',dondePresentar:'Centro de Diagnóstico MEC / archivo institucional'},
+      {documento:'Nómina de alumnos inclusivos por nivel',alumnos:'Todos los niveles',baseLegal:'Res. MEC 29.664/2012',estado:'Pendiente',fechaLimite:'2026-03-31',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa'},
+      {documento:'Constancia de diagnóstico médico/psicológico',alumnos:'Alumnos nuevos',baseLegal:'Ley 5136/2013 Art. 9',estado:'Pendiente',fechaLimite:'',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+      {documento:'Plan de Apoyos y Recursos (PAR)',alumnos:'Alumnos con adecuación significativa',baseLegal:'Decreto 1.350/2019',estado:'Pendiente',fechaLimite:'2026-05-15',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+      {documento:'Acta de compromiso familiar firmada',alumnos:'Cada familia de alumno inclusivo',baseLegal:'Res. MEC 29.664/2012',estado:'Pendiente',fechaLimite:'',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+      {documento:'Informe final anual de progreso',alumnos:'Todos los alumnos inclusivos',baseLegal:'Ley 5136/2013 Art. 16',estado:'Pendiente',fechaLimite:'2026-11-30',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa Departamental'},
+      {documento:'Solicitud de recursos de apoyo (intérprete, asistente)',alumnos:'Según necesidad',baseLegal:'Decreto 1.350/2019 Art. 30',estado:'Pendiente',fechaLimite:'2026-03-01',responsable:'Lic. Rodrigo Godoy',dondePresentar:'DGEEI - Dirección Gral. Ed. Especial e Inclusiva'},
+      {documento:'Certificado de discapacidad SENADIS actualizado',alumnos:'Alumnos que corresponda',baseLegal:'Ley 4962/2013',estado:'Pendiente',fechaLimite:'',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+    ].forEach(d => DB.add('documentos', d));
+  }
+
+  if (!DB.get('calendario').length) {
+    [
+      {mes:'Febrero',accion:'Inicio de año escolar — Identificación de alumnos inclusivos',fecha:'2026-02-16',normativa:'Ley 5136/2013',destinatario:'Dirección / Docentes',estado:'Pendiente'},
+      {mes:'Febrero',accion:'Entrega de informes de alumnos inclusivos del año anterior',fecha:'2026-02-28',normativa:'Res. 29.664/2012',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Marzo',accion:'Matrícula especial / diferenciada — Cierre',fecha:'2026-03-15',normativa:'Res. 29.664/2012 Art.8',destinatario:'Secretaría',estado:'Pendiente'},
+      {mes:'Marzo',accion:'Nómina de alumnos inclusivos a Supervisión',fecha:'2026-03-31',normativa:'Res. 29.664/2012',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Abril',accion:'Elaboración de PEI (Plan Educativo Individual) — plazo',fecha:'2026-04-30',normativa:'Ley 5136/2013 Art.15',destinatario:'Docentes + Psicología',estado:'Pendiente'},
+      {mes:'Mayo',accion:'Plan de Apoyos y Recursos (PAR) — entrega',fecha:'2026-05-15',normativa:'Decreto 1.350/2019',destinatario:'Coordinadores',estado:'Pendiente'},
+      {mes:'Mayo',accion:'Reunión con familias — 1er seguimiento',fecha:'2026-05-30',normativa:'Res. 29.664/2012',destinatario:'Dirección / Docentes',estado:'Pendiente'},
+      {mes:'Junio',accion:'Evaluación trimestral con adecuaciones — 1er trimestre',fecha:'2026-06-15',normativa:'Ley 5136/2013 Art.16',destinatario:'Docentes',estado:'Pendiente'},
+      {mes:'Julio',accion:'Informe de adecuaciones 1er semestre — entrega Supervisión',fecha:'2026-07-15',normativa:'Res. 29.664/2012 Art.12',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Julio',accion:'Planilla de matrícula inclusiva — actualización',fecha:'2026-07-31',normativa:'Res. 29.664/2012',destinatario:'Secretaría',estado:'Pendiente'},
+      {mes:'Agosto',accion:'Evaluaciones psicopedagógicas — plazo renovación',fecha:'2026-08-31',normativa:'Decreto 1.350/2019 Art.22',destinatario:'Psicología',estado:'Pendiente'},
+      {mes:'Septiembre',accion:'Revisión PEI — ajuste 2do semestre',fecha:'2026-09-15',normativa:'Ley 5136/2013',destinatario:'Docentes + Psicología',estado:'Pendiente'},
+      {mes:'Septiembre',accion:'Reunión con familias — 2do seguimiento',fecha:'2026-09-30',normativa:'Res. 29.664/2012',destinatario:'Dirección / Docentes',estado:'Pendiente'},
+      {mes:'Octubre',accion:'Evaluación trimestral con adecuaciones — 2do trimestre',fecha:'2026-10-15',normativa:'Ley 5136/2013 Art.16',destinatario:'Docentes',estado:'Pendiente'},
+      {mes:'Noviembre',accion:'Informe de adecuaciones 2do semestre — entrega Supervisión',fecha:'2026-11-30',normativa:'Res. 29.664/2012 Art.12',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Noviembre',accion:'Informe final anual de progreso inclusivo',fecha:'2026-11-30',normativa:'Ley 5136/2013 Art.16',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Diciembre',accion:'Reunión de cierre con familias',fecha:'2026-12-05',normativa:'Res. 29.664/2012',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Diciembre',accion:'Archivo de expedientes inclusivos del año',fecha:'2026-12-15',normativa:'Res. 29.664/2012',destinatario:'Secretaría',estado:'Pendiente'},
+    ].forEach(c => DB.add('calendario', c));
+  }
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+async function initApp() {
+  // Intentar reconectar con la clave de esta sesión
+  const pw = getPassword();
+  if (pw) {
+    const ok = await cargarDesdeServidor(pw);
+    if (ok) {
+      preload();
+      _saveStatus = 'ok';
+      updateFileStatus();
+      renderDashboard();
+      const ov = document.getElementById('startup-overlay');
+      if (ov) ov.remove();
+      return;
+    }
+  }
+  // Si no, el overlay espera que el usuario ingrese la clave
+  updateFileStatus();
+}
+
+// Enter en el input de clave
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const inp = document.getElementById('input-clave');
+    if (inp && document.activeElement === inp) {
+      arrancarConClave(inp.value.trim());
+    }
+  }
+});
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="/js/app-v2.js"></script>
+
+<!-- ═══════════════ STARTUP OVERLAY ═══════════════ -->
+<div id="startup-overlay" style="position:fixed;inset:0;background:rgba(31,56,100,.97);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif">
+  <div style="background:#fff;border-radius:14px;padding:40px 44px;max-width:440px;width:92%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+    <div style="width:56px;height:56px;background:#DEEAF1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+      <i class="bi bi-mortarboard-fill" style="font-size:26px;color:#1F3864"></i>
+    </div>
+    <div style="font-size:11px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Colegio Presbiteriano Cerritos</div>
+    <div style="font-size:20px;font-weight:700;color:#1F3864;margin-bottom:6px">Sistema de Educación Inclusiva</div>
+    <div style="font-size:12.5px;color:#666;margin-bottom:22px">Ingresá tu nombre y la clave de acceso</div>
+
+    <input id="input-usuario" type="text" placeholder="Tu nombre (ej: Lic. Rodrigo Godoy)"
+      style="width:100%;padding:10px 14px;border:2px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none;text-align:center"
+      onfocus="this.style.borderColor='#2E75B6'" onblur="this.style.borderColor='#ddd'">
+
+    <input id="input-clave" type="password" placeholder="Clave de acceso"
+      style="width:100%;padding:12px 14px;border:2px solid #ddd;border-radius:8px;font-size:15px;margin-bottom:12px;outline:none;text-align:center;letter-spacing:2px"
+      onfocus="this.style.borderColor='#2E75B6'" onblur="this.style.borderColor='#ddd'">
+
+    <button onclick="arrancarConClave(document.getElementById('input-clave').value.trim())"
+      style="width:100%;padding:13px;background:#2E75B6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px">
+      <i class="bi bi-box-arrow-in-right" style="font-size:17px"></i> Ingresar
+    </button>
+
+    <div id="startup-msg" style="font-size:11.5px;min-height:20px;margin-top:14px"></div>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid #eee;font-size:10px;color:#bbb">
+      <i class="bi bi-shield-check me-1"></i>Todos los usuarios comparten los mismos datos en tiempo real
+    </div>
+  </div>
+</div>
+</body>
+</html>

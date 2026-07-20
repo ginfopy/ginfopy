@@ -1,0 +1,2 @@
+v09 — Base antes de implementar hora en eventos (ordenamiento por hora dentro del día)
+Incluye: login corregido (SHA-256 puro JS síncrono), todas las funcionalidades anteriores.

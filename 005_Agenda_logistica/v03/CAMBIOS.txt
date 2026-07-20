@@ -1,0 +1,51 @@
+v03 — Sistema multiusuario completo + mejoras de usabilidad
+
+AUTENTICACIÓN Y USUARIOS
+- Pantalla de setup inicial para crear administrador (primer uso)
+- Login con usuario + contraseña (hash SHA-256)
+- Sesión en sessionStorage (se cierra al cerrar el navegador)
+- Namespacing de eventos por usuario (agendaEventos_{userId})
+- Panel Admin con dos tabs: Gestión de usuarios y Eficiencia
+- Crear / eliminar usuarios desde el panel admin
+- Cambiar contraseña de cualquier usuario desde el panel admin
+- Nombre de institución configurable (sin referencias hardcodeadas)
+
+VISTAS ADMIN
+- Toggle Mi agenda / Vista general en toolbar
+- Vista general: lectura de eventos de todos los usuarios (solo lectura)
+- Selector de usuario destacado en contenido principal (chips por usuario)
+- Filtro adicional por usuario en toolbar
+- Banner de eficiencia por usuario en Vista general
+
+EFICIENCIA Y SEGUIMIENTO
+- Registro de fecha de completado (doneAt en eventos principales)
+- Registro de fecha de completado por día de logística (doneLogsAt)
+- Badge "en fecha" / "tarde" en cada fila de logística completada
+- Panel de eficiencia con métricas por usuario (tab en Panel Admin)
+
+RESPALDO Y RESTAURACIÓN
+- Respaldo incluye TODOS los usuarios (formato v3 multi-usuario)
+- Restaurar detecta formato v3 (multi-usuario) o v2/v1 (usuario único)
+- Numeración secuencial en nombre de archivo cuando hay varios respaldos el mismo día
+- Modal de importar con descripción ampliada del formato esperado
+
+FUNCIONALIDADES DE AGENDA
+- Búsqueda en tiempo real por nombre de evento (ítem 1)
+- Vista compacta: oculta días de logística, muestra solo eventos (ítem 4)
+- Duplicar evento: clona con datos precargados para ajustar fechas (ítem 5)
+- Categorías/etiquetas: Académico, Administrativo, Deportivo, Cultural, Externo (ítem 6)
+- Filtro por categoría en el menú desplegable de filtros
+- Límite de logística previa ampliado de 20 a 60 días hábiles (ítem 7)
+- Botones S (Solo) y M (Mute) por evento
+- Barra de progreso logístico por evento principal
+- Escala de calor en eventos de logística según proximidad
+- Fila de hoy resaltada con colores invertidos
+- Ayer / hoy / mañana siempre visibles aunque no tengan eventos
+- Nombre del día de la semana completo
+
+PENDIENTE (próximos ítems)
+- 2. Notas al completar día de logística
+- 3. Notificaciones del navegador
+- 8-13. Panel estadístico del administrador
+- 14. Archivado de eventos completados
+- 15. Exportar a PDF / impresión

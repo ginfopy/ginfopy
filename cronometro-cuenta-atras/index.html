@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuenta atrás</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Cuenta atrás</h1>
+      <p class="subtitle">Pitido cada segundo · tono al pasar cada minuto · alarma al llegar a cero</p>
+    </header>
+
+    <section class="setup" id="setup" aria-label="Configuración del tiempo">
+      <div class="time-inputs">
+        <label>
+          <span>Horas</span>
+          <input type="number" id="hours" min="0" max="99" value="0" inputmode="numeric" />
+        </label>
+        <label>
+          <span>Minutos</span>
+          <input type="number" id="minutes" min="0" max="59" value="5" inputmode="numeric" />
+        </label>
+        <label>
+          <span>Segundos</span>
+          <input type="number" id="seconds" min="0" max="59" value="0" inputmode="numeric" />
+        </label>
+      </div>
+      <div class="actions setup-actions">
+        <button type="button" class="btn primary" id="btnStart">Iniciar</button>
+      </div>
+    </section>
+
+    <section class="run" id="run" hidden aria-live="polite">
+      <div class="display" id="display">00:00</div>
+      <div class="run-actions">
+        <button type="button" class="btn" id="btnPause">Pausar</button>
+        <button type="button" class="btn danger" id="btnReset">Reiniciar</button>
+      </div>
+    </section>
+
+    <p class="hint" id="hint">Pulsa Iniciar para activar el audio (los navegadores lo exigen tras un gesto del usuario).</p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

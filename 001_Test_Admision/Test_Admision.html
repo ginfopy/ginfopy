@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Admisión - Colegio Cerritos</title>
+    <!-- Tailwind CSS para diseño profesional -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Deshabilitar selección de texto para mitigar copias rápidas */
+        body { user-select: none; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen">
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        
+        <!-- PANTALLA 1: REGISTRO DEL POSTULANTE -->
+        <section id="screen-auth" class="bg-white rounded-xl shadow-md p-8 border border-slate-200 max-w-md mx-auto mt-12">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-slate-900">Admisión Técnica</h1>
+                <p class="text-sm text-slate-500 mt-1">Test de Pensamiento Computacional y Lógica</p>
+            </div>
+            
+            <form id="form-auth" onsubmit="startTest(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nombre Completo del Postulante</label>
+                    <input type="text" id="student-name" required autocomplete="off"
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Número de Cédula de Identidad</label>
+                    <input type="text" id="student-id" required autocomplete="off" placeholder="Ej: XXX"
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                </div>
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-3 rounded text-xs text-amber-800 space-y-1">
+                    <p class="font-bold">Instrucciones Críticas:</p>
+                    <p>• Dispone de exactamente 75 minutos una vez iniciado.</p>
+                    <p>• No recargue la página ni cierre el navegador o perderá el progreso.</p>
+                    <p>• El uso de calculadora o asistencia externa está prohibido.</p>
+                </div>
+                <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer text-center">
+                    Iniciar Evaluación
+                </button>
+            </form>
+        </section>
+
+        <!-- PANTALLA 2: INTERFAZ DEL TEST -->
+        <section id="screen-quiz" class="hidden space-y-6">
+            <!-- Barra superior fija de control -->
+            <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 flex flex-wrap justify-between items-center sticky top-2 z-10 gap-4">
+                <div>
+                    <h2 id="display-student-name" class="font-bold text-slate-900 text-lg">---</h2>
+                    <p id="display-student-id" class="text-xs text-slate-500">C.I.: XXX</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Tiempo Restante</span>
+                        <span id="timer" class="text-xl font-mono font-bold text-red-600">75:00</span>
+                    </div>
+                    <button onclick="finishTest()" 
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors cursor-pointer">
+                        Finalizar y Enviar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor dinámico de preguntas -->
+            <div id="quiz-container" class="space-y-6"></div>
+            
+            <!-- Botón de cierre inferior -->
+            <div class="text-right pt-4">
+                <button onclick="finishTest()" 
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-lg shadow transition-colors cursor-pointer">
+                    Finalizar Evaluación
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 3: RESULTADOS (VISTA EXCLUSIVA PARA EL DOCENTE / CONFIRMACIÓN) -->
+        <section id="screen-results" class="hidden bg-white rounded-xl shadow-md p-8 border border-slate-200 max-w-xl mx-auto text-center mt-12 space-y-6">
+            <div class="inline-flex p-3 bg-emerald-100 text-emerald-600 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">Evaluación Guardada con Éxito</h1>
+                <p class="text-sm text-slate-500 mt-1">El registro ha sido procesado de forma segura.</p>
+            </div>
+
+            <!-- Cuadro de datos técnicos calificados -->
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200 text-left space-y-3 font-mono text-sm">
+                <p><strong>Postulante:</strong> <span id="res-name">---</span></p>
+                <p><strong>Documento C.I.:</strong> <span id="res-id">---</span></p>
+                <hr class="border-slate-200">
+                <p><strong>Aciertos Totales:</strong> <span id="res-score" class="font-bold text-blue-600">0 / 25</span></p>
+                <p><strong>Puntaje Porcentual:</strong> <span id="res-percent" class="font-bold text-blue-600">0%</span></p>
+                <p><strong>Nivel de Aptitud:</strong> <span id="res-level" class="font-bold">---</span></p>
+                <hr class="border-slate-200">
+                <p class="text-xs text-slate-400">Hash de Integridad: <span id="res-hash" class="text-[10px]">---</span></p>
+            </div>
+
+            <div class="pt-2">
+                <button onclick="exportToCSV()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors cursor-pointer text-sm inline-flex items-center gap-2">
+                    Descargar Ficha Técnica (CSV)
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- LÓGICA DE CONTROL DEL EXAMEN -->
+    <script>
+        // Banco completo de los 25 ítems estructurado como un array relacional indexado
+        const questionsData = [
+            // Bloque 1
+            { id: 1, block: 1, q: "Un robot recolector camina 2 metros adelante, gira 90° a la derecha y avanza 1 metro. Si repite esta secuencia exacta 4 veces desde el origen, ¿dónde termina?", options: ["A 4 metros a la izquierda del inicio.", "Regresa exactamente al mismo punto de inicio.", "Dibuja una línea en zigzag infinito.", "Se aleja en línea recta hacia el norte."], correct: 1 },
+            { id: 2, block: 1, q: "Se ejecuta el siguiente flujo lineal de asignación: 1. A = 5; 2. B = 10; 3. A = B; 4. B = 5 (valor original de A). ¿Cuáles son los valores finales de las variables?", options: ["A = 5; B = 10", "A = 10; B = 10", "A = 10; B = 5", "A = 5; B = 5"], correct: 2 },
+            { id: 3, block: 1, q: "Una cinta transportadora mueve una caja. Pasos: 1. Avanza 3 metros; 2. Retrocede 1 metro; 3. Avanza el doble de lo que retrocedió en el paso 2. ¿A cuántos metros del punto inicial queda la caja?", options: ["3 metros.", "4 metros.", "5 metros.", "2 metros."], correct: 1 },
+            { id: 4, block: 1, q: "Si aplicar la instrucción inversa 'Multiplicar por 3 y restar 2' da como resultado final en pantalla el número 13, ¿cuál era el número inicial antes de procesarse?", options: ["3", "5", "4", "6"], correct: 1 },
+            { id: 5, block: 1, q: "Cuatro archivos (W, X, Y, Z) entran a un servidor de impresión. El servidor procesa primero el más chico. Si los tamaños son: W=12MB, X=45MB, Y=8MB, Z=20MB. ¿Cuál es el tercer archivo en procesarse?", options: ["Y", "Z", "W", "X"], correct: 1 },
+            { id: 6, block: 1, q: "En una cuadrícula, un cursor arranca en la posición (0,0). Cada instrucción AVANZAR_X suma 1 a la primera coordenada, y AVANZAR_Y suma 1 a la segunda. Si el comando ejecutado es: AVANZAR_X, AVANZAR_Y, AVANZAR_X, AVANZAR_X. ¿Cuál es la posición final?", options: ["(1,3)", "(3,1)", "(2,2)", "(4,0)"], correct: 1 },
+            // Bloque 2
+            { id: 7, block: 2, q: "Considere la secuencia numérica de almacenamiento de datos: 3, 6, 12, 24, 48, ... ¿Qué regla define de forma exacta la serie para hallar el siguiente valor?", options: ["Sumar 3 al término anterior.", "Elevar al cuadrado el término anterior.", "Multiplicar por 2 el término anterior.", "Sumar los dos términos anteriores."], correct: 2 },
+            { id: 8, block: 2, q: "Al diseñar un software de inventario, se omiten los colores de las cajas y los nombres de los choferes, registrando solo códigos de barra, precios y existencias. ¿Cómo se llama este proceso?", options: ["Descomposición.", "Abstracción.", "Pensamiento algorítmico.", "Modulación."], correct: 1 },
+            { id: 9, block: 2, q: "Analice la siguiente cadena de datos generada de forma consecutiva por un sistema informático: A1, C3, E5, G7, ... ¿Cuál es el siguiente elemento lógico?", options: ["H8", "I9", "F6", "J10"], correct: 1 },
+            { id: 10, block: 2, q: "En un lote de transacciones que debe seguir estrictamente el patrón 'Múltiplo de 5 seguido de un número impar' ([5, 3], [10, 7], [15, 9]), ¿cuál de los siguientes registros rompe el patrón establecido?", options: ["[20, 11]", "[22, 13]", "[25, 1]", "[30, 5]"], correct: 1 },
+            { id: 11, block: 2, q: "Un alumno resume una base de datos de 1.000 clientes agrupándolos únicamente por 'Ciudad' y 'Estado de Cuenta', eliminando direcciones, teléfonos y correos. Este procedimiento es un ejemplo directo de:", options: ["Codificación.", "Abstracción de datos.", "Encriptación.", "Depuración."], correct: 1 },
+            { id: 12, block: 2, q: "Una máquina cambia de luces según el dinero ingresado: 1000 Gs (Verde), 2000 Gs (Azul), 3000 Gs (Verde), 4000 Gs (Azul). Si un cliente ingresa un acumulado total de 7000 Gs, ¿de qué color estará la luz?", options: ["Verde.", "Azul.", "Roja.", "Amarilla."], correct: 0 },
+            // Bloque 3
+            { id: 13, block: 3, q: "Instrucciones: 1. Si Hora < 12, Saludo = 'Buenos días'; 2. Si Hora >= 12 e Hora < 19, Saludo = 'Buenas tardes'; 3. En otro caso, Saludo = 'Buenas noches'. Si el reloj marca Hora = 19, ¿cuál es el saludo?", options: ["Buenos días.", "Buenas tardes.", "Buenas noches.", "Error de sistema."], correct: 2 },
+            { id: 14, block: 3, q: "Una alarma se activa (Verdadero) si el sensor de movimiento detecta presencia (S1 = Verdadero) Y el interruptor general está encendido (S2 = Verdadero). ¿Cuándo se activa la alarma?", options: ["Solo cuando ambos sensores son Verdaderos.", "Cuando al menos uno es Verdadero.", "Solo cuando ambos son Falsos.", "Siempre que S2 sea Falso."], correct: 0 },
+            { id: 15, block: 3, q: "El portal de Contabilidad permite el acceso si el usuario introduce la clave correcta O si utiliza un token de emergencia. Un usuario erra la clave pero activa el token. El sistema:", options: ["Deniega el acceso por el error de clave.", "Permite el acceso.", "Bloquea la cuenta permanentemente.", "Emite un aviso de error crítico."], correct: 1 },
+            { id: 16, block: 3, q: "Si un alumno tiene Edad > 15 y Paga_Matrícula = Sí, se le asigna sección. Si tiene Edad <= 15 pero Paga_Matrícula = Sí, va a lista de espera. Si Paga_Matrícula = No, no ingresa. Evaluando a un joven de 14 años con la matrícula pagada, el sistema lo ubica en:", options: ["Asignado a sección.", "No ingresa.", "Lista de espera.", "Rechazado por edad."], correct: 2 },
+            { id: 17, block: 3, q: "Una compuerta digital invierte el paso de energía: si recibe señal alta (1), entrega baja (0); si recibe baja (0), entrega alta (1). Si conectamos dos compuertas inversoras en fila y enviamos una señal alta (1), la salida final es:", options: ["Baja (0).", "Alta (1).", "Intermitente.", "Nula."], correct: 1 },
+            { id: 18, block: 3, q: "Un software de facturación aplica un 10% de descuento si el cliente compra más de 5 artículos O si paga con tarjeta de crédito. ¿Cuál cliente NO recibe el descuento de la plataforma?", options: ["Compró 6 artículos y pagó en efectivo.", "Compró 3 artículos y pagó con tarjeta de crédito.", "Compró 8 artículos y pagó con tarjeta de crédito.", "Compró 4 artículos y pagó en efectivo."], correct: 3 },
+            // Bloque 4
+            { id: 19, block: 4, q: "Para inscribir un alumno, el analista divide el problema en tres subtareas ordenadas: 1. Validar cédula; 2. Registrar datos; 3. Procesar cobro. ¿Cómo se llama este pilar lógico?", options: ["Abstracción.", "Descomposición.", "Reconocimiento de patrones.", "Diseño algorítmico."], correct: 1 },
+            { id: 20, block: 4, q: "Un bucle recorre la lista de notas [3, 1, 4, 5, 1, 2]. Condición interna: 'Si la nota es estrictamente menor que 2, sumar 1 al contador'. Al finalizar, ¿qué valor tiene el contador?", options: ["0", "3", "2", "1"], correct: 2 },
+            { id: 21, block: 4, q: "Proceso: 1. Revisar tamaño; 2. Si es > 100 MB, mover a 'Pesados'; 3. Si no, si es imagen, mover a 'Media'; 4. Si no, mover a 'Documentos'. Un archivo de texto plano de 150 MB se moverá a la carpeta:", options: ["Documentos.", "Media.", "Pesados.", "Ninguna de las anteriores."], correct: 2 },
+            { id: 22, block: 4, q: "Un algoritmo inicializa una variable Suma = 0. Luego ejecuta un bucle que suma el número de la posición actual si este es par. Dada la lista consecutiva [1, 2, 3, 4, 5], ¿cuál es el valor final de Suma?", options: ["15", "6", "4", "2"], correct: 1 },
+            { id: 23, block: 4, q: "Un sistema descarga un archivo de 10 MB en bloques fijos de 2 MB por segundo. El algoritmo repite el proceso mientras el total descargado sea menor a 10 MB. ¿Cuántas veces se ejecuta el ciclo?", options: ["5 veces.", "10 veces.", "4 veces.", "6 veces."], correct: 0 },
+            { id: 24, block: 4, q: "Para diseñar el módulo de balances, el encargado separa el trabajo en de forma atomizada en: Cálculo de Activos, Cálculo de Pasivos y Resta de Patrimonio Neto. Este enfoque metodológico evita:", options: ["Que el programa use variables matemáticas.", "La saturación por intentar resolver todo el sistema de forma simultánea.", "El uso de operadores de comparación.", "El almacenamiento en discos duros."], correct: 1 },
+            { id: 25, block: 4, q: "Un software revisa una fila de productos dañados. Inspecciona el primero; si está roto, lo descarta y avanza al siguiente. Se detiene inmediatamente al encontrar un producto sano. Si la fila contiene [Roto, Roto, Roto, Sano, Roto], ¿cuántos productos fueron descartados?", options: ["4", "5", "3", "1"], correct: 2 }
+        ];
+
+        let studentData = { name: "", id: "" };
+        let timerInterval = null;
+        let timeRemaining = 75 * 60; // 75 minutos en segundos
+
+        // 1. INICIAR EL EXAMEN
+        function startTest(event) {
+            event.preventDefault();
+            studentData.name = document.getElementById("student-name").value.trim();
+            studentData.id = document.getElementById("student-id").value.trim();
+            
+            // Asignar etiquetas a la barra superior fija
+            document.getElementById("display-student-name").innerText = studentData.name;
+            document.getElementById("display-student-id").innerText = "C.I.: " + studentData.id;
+            
+            // Renderizar preguntas ordenadas aleatoriamente para evitar patrones de copia
+            renderQuiz();
+            
+            // Cambio de vista fluida de pantallas
+            document.getElementById("screen-auth").classList.add("hidden");
+            document.getElementById("screen-quiz").classList.remove("hidden");
+            
+            // Activar reloj regresivo de control
+            startTimer();
+        }
+
+        // 2. CONTROL DEL RELOJ
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                let mins = Math.floor(timeRemaining / 60);
+                let secs = timeRemaining % 60;
+                
+                document.getElementById("timer").innerText = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert("El tiempo asignado por el MEC ha expirado. El examen se cerrará de forma automática.");
+                    finishTest();
+                }
+            }, 1000);
+        }
+
+        // 3. RENDERIZACIÓN DINÁMICA DE LA MATRIZ DE PREGUNTAS
+        function renderQuiz() {
+            const container = document.getElementById("quiz-container");
+            container.innerHTML = "";
+            
+            questionsData.forEach((item, index) => {
+                const card = document.createElement("div");
+                card.className = "bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4";
+                
+                // Encabezado técnico del ítem
+                const header = document.createElement("div");
+                header.className = "flex justify-between items-center text-xs text-slate-400 font-mono";
+                header.innerHTML = `<span>ÍTEM N° ${index + 1} / 25</span> <span class="bg-slate-100 px-2 py-0.5 rounded">Bloque Técnico ${item.block}</span>`;
+                card.appendChild(header);
+                
+                // Enunciado
+                const title = document.createElement("p");
+                title.className = "text-slate-900 font-medium text-base";
+                title.innerText = item.q;
+                card.appendChild(title);
+                
+                // Opciones radio buttons estructuradas
+                const optionsDiv = document.createElement("div");
+                optionsDiv.className = "grid grid-cols-1 md:grid-cols-2 gap-3";
+                
+                item.options.forEach((opt, optIndex) => {
+                    const label = document.createElement("label");
+                    label.className = "flex items-start gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors text-sm text-slate-700";
+                    label.innerHTML = `
+                        <input type="radio" name="question-${item.id}" value="${optIndex}" class="mt-0.5 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                        <span>${opt}</span>
+                    `;
+                    optionsDiv.appendChild(label);
+                });
+                
+                card.appendChild(optionsDiv);
+                container.appendChild(card);
+            });
+        }
+
+        // 4. PROCESAMIENTO DE RESPUESTAS Y CÁLCULO DE BAREMOS
+        function finishTest() {
+            clearInterval(timerInterval);
+            let totalCorrect = 0;
+            let breakdown = []; // Almacenar el reporte analítico por bloque para el desempate institucional
+            
+            questionsData.forEach(item => {
+                const selected = document.querySelector(`input[name="question-${item.id}"]:checked`);
+                const answerValue = selected ? parseInt(selected.value) : -1;
+                const isCorrect = answerValue === item.correct;
+                
+                if (isCorrect) totalCorrect++;
+                
+                breakdown.push({
+                    id: item.id,
+                    block: item.block,
+                    correct: isCorrect
+                });
+            });
+            
+            const finalPercent = totalCorrect * 4; // Cada pregunta equivale al 4%
+            let level = "";
+            let cssColor = "";
+            
+            // Evaluación basada en el Baremo Institucional
+            if (finalPercent >= 96) { level = "Excelente"; cssColor = "text-emerald-600"; }
+            else if (finalPercent >= 84) { level = "Muy Bueno"; cssColor = "text-emerald-600"; }
+            else if (finalPercent >= 72) { level = "Bueno"; cssColor = "text-blue-600"; }
+            else if (finalPercent >= 60) { level = "Aceptable (Mínimo)"; cssColor = "text-amber-600"; }
+            else if (finalPercent >= 44) { level = "Insuficiente"; cssColor = "text-red-600"; }
+            else { level = "Deficiente"; cssColor = "text-red-600"; }
+            
+            // Cargar datos a la vista del reporte final
+            document.getElementById("res-name").innerText = studentData.name;
+            document.getElementById("res-id").innerText = studentData.id;
+            document.getElementById("res-score").innerText = `${totalCorrect} / 25`;
+            document.getElementById("res-percent").innerText = `${finalPercent}%`;
+            
+            const elLevel = document.getElementById("res-level");
+            elLevel.innerText = level;
+            elLevel.className = `font-bold ${cssColor}`;
+            
+            // Generar clave hash simulada de seguridad de la prueba
+            document.getElementById("res-hash").innerText = "CERRITOS-PC-" + Math.random().toString(36).substring(2, 15).toUpperCase();
+            
+            // Adjuntar los datos de la sesión para la exportación de datos
+            studentData.score = totalCorrect;
+            studentData.percent = finalPercent;
+            studentData.level = level;
+            studentData.breakdown = breakdown;
+
+            // Transición de pantalla a resultados
+            document.getElementById("screen-quiz").classList.add("hidden");
+            document.getElementById("screen-results").classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 5. EXPORTACIÓN DE HOJA TÉCNICA (Formato estándar CSV legible por Excel)
+        function exportToCSV() {
+            // Contar aciertos del Bloque 4 para aplicar el criterio interno de desempate
+            const block4Correct = studentData.breakdown.filter(x => x.block === 4 && x.correct).length;
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Propiedad,Valor\n";
+            csvContent += `Postulante,"${studentData.name}"\n`;
+            csvContent += `Cedula de Identidad,${studentData.id}\n`;
+            csvContent += `Respuestas Correctas,${studentData.score} / 25\n`;
+            csvContent += `Puntaje Porcentual,${studentData.percent}%\n`;
+            csvContent += `Nivel de Aptitud,"${studentData.level}"\n`;
+            csvContent += `Aciertos Bloque 4 (Desempate),${block4Correct} / 7\n`;
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Ficha_Admision_${studentData.id}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

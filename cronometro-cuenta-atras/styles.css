@@ -1,0 +1,209 @@
+:root {
+  --bg: #0c0f14;
+  --surface: #151a22;
+  --border: #2a3344;
+  --text: #e8ecf4;
+  --muted: #8b96ab;
+  --accent: #3d9eff;
+  --accent-dim: #2563a8;
+  --danger: #f87171;
+  --glow: rgba(61, 158, 255, 0.35);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: clamp(14px, 2.5vw, 18px);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: "Outfit", system-ui, sans-serif;
+  background: radial-gradient(ellipse 120% 80% at 50% -20%, #1a2840 0%, var(--bg) 55%);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.app {
+  width: min(100%, 36rem);
+  transition: width 0.35s ease;
+}
+
+.app.app--running {
+  width: min(100%, min(96vw, 52rem));
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-weight: 600;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.setup,
+.run {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+.time-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.time-inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.time-inputs input {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 1.35rem;
+  font-weight: 500;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  width: 100%;
+}
+
+.time-inputs input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow);
+}
+
+.actions,
+.run-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.65rem 1.35rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.btn:hover {
+  border-color: var(--muted);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn.primary {
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
+  border-color: transparent;
+  color: #fff;
+  min-width: 10rem;
+}
+
+.btn.primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn.danger {
+  border-color: rgba(248, 113, 113, 0.4);
+  color: var(--danger);
+}
+
+.btn.danger:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.display {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 700;
+  font-size: clamp(4.25rem, 18vmin, 12rem);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0.35rem 0 1.25rem;
+  color: hsl(var(--heat-h, 232), var(--heat-s, 76%), var(--heat-l, 62%));
+  text-shadow:
+    0 0 clamp(28px, 5vmin, 72px) hsla(var(--heat-h, 232), var(--heat-s, 76%), 52%, var(--heat-a, 0.42)),
+    0 0 clamp(12px, 2vmin, 28px) hsla(var(--heat-h, 232), 85%, 96%, 0.14);
+  transition:
+    color 0.45s ease,
+    text-shadow 0.45s ease,
+    font-size 0.35s ease;
+}
+
+.display.display--long {
+  font-size: clamp(3rem, 11vmin, 8rem);
+  letter-spacing: -0.04em;
+}
+
+.display.flash-zero {
+  animation: flash 0.6s ease;
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    color: hsl(2, 96%, 58%);
+    text-shadow:
+      0 0 clamp(36px, 6vmin, 88px) hsla(2, 100%, 52%, 0.78),
+      0 0 clamp(14px, 2.5vmin, 32px) hsla(0, 0%, 100%, 0.22);
+  }
+  50% {
+    color: #fff8f8;
+    text-shadow:
+      0 0 clamp(48px, 8vmin, 100px) rgba(255, 80, 80, 0.85),
+      0 0 clamp(18px, 3vmin, 40px) rgba(255, 255, 255, 0.35);
+  }
+}
+
+.hint {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.hint[hidden] {
+  display: none;
+}

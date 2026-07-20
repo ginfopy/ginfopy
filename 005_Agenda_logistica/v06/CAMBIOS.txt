@@ -1,0 +1,2 @@
+v06 — Base antes de implementar ítem 14 (archivado de eventos)
+Incluye: notas al completar logística, panel estadístico completo y todos los anteriores.

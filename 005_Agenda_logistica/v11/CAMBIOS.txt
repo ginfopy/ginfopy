@@ -1,0 +1,26 @@
+v11 — Sidebar vertical izquierdo (reemplaza menú horizontal superior)
+Incluye: hora en eventos, notificaciones, impresión/PDF, archivado, notas al
+completar logística, panel estadístico, eficiencia, categorías, multiusuario
+y todos los anteriores.
+
+CAMBIOS RESPECTO A v10
+- Toolbar horizontal fija (.toolbar) reemplazada por sidebar vertical fijo (.sidebar)
+- body: padding-top → padding-left (var(--sidebar-w): 220px)
+- Marca/institución, buscador, botón "Nuevo evento", filtros (tipo/usuario),
+  ver completados, vista compacta, import/export/restaurar, herramientas
+  (archivo, imprimir, notificaciones, estadísticas, panel admin) y usuario/salir
+  reorganizados en secciones verticales con separadores (.sb-label, .sb-sep)
+- Botón "Nuevo evento" ahora destacado arriba del todo (sb-btn-primary)
+- Chip de usuario movido al pie del sidebar (sb-footer)
+
+RESPONSIVIDAD MÓVIL (agregado tras revisión)
+- @media(max-width:768px): sidebar pasa a off-canvas (transform:translateX(-100%)
+  con transición), body sin padding-left
+- Botón hamburguesa fijo (#sbToggle, visible solo en mobile vía body.app-on)
+  para abrir/cerrar el sidebar
+- Fondo oscuro (#sbBackdrop) que cierra el sidebar al tocar fuera de él
+- Clase body.app-on agregada/quitada en mostrarApp()/mostrarLoginScreen()
+  para controlar la visibilidad del botón hamburguesa sin pisar los estilos
+  inline existentes
+- Verificado con preview en 375x812 (mobile), 768x1024 (tablet) y desktop:
+  sin errores de consola, comportamiento correcto en los tres tamaños

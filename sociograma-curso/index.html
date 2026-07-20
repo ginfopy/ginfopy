@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sociograma — Profesor</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Sociograma del curso <span class="prof-badge">Profesor</span></h1>
+      <p class="lede">
+        Gestiona varios cursos; los datos se guardan en <code>datos.json</code> de esta carpeta al usar el servidor local (<code>npm start</code>).
+        En cada curso: alumnos, cinco actividades y preferencias; el sociograma es independiente por grupo.
+      </p>
+      <div class="curso-bar">
+        <label class="field curso-field">
+          <span>Curso activo</span>
+          <select id="curso-select" aria-label="Seleccionar curso"></select>
+        </label>
+        <button type="button" id="btn-nuevo-curso" class="btn primary">Nuevo curso</button>
+        <button type="button" id="btn-renombrar-curso" class="btn">Renombrar</button>
+        <button type="button" id="btn-eliminar-curso" class="btn danger">Eliminar curso</button>
+      </div>
+      <p id="storage-status" class="meta storage-status"></p>
+      <div class="encuesta-prof-box" id="encuesta-prof-box" hidden>
+        <h2 class="encuesta-prof-title">Enlace para que rellenen los alumnos</h2>
+        <p class="hint">Comparte esta dirección (otra página, no la del profesor). Cada alumno elige curso, nombre y envía sus preferencias.</p>
+        <div class="encuesta-url-row">
+          <input type="text" id="encuesta-url-input" class="encuesta-url-input" readonly />
+          <button type="button" id="btn-copy-encuesta" class="btn primary">Copiar enlace</button>
+          <a id="encuesta-url-open" class="btn" href="encuesta.html" target="_blank" rel="noopener">Abrir</a>
+        </div>
+        <p class="hint encuesta-url-hint" id="encuesta-url-curso"></p>
+        <p id="pref-envio-estado" class="meta pref-envio-estado"></p>
+        <ul id="pref-envio-lista" class="envio-lista"></ul>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button type="button" class="tab active" data-tab="alumnos" role="tab" aria-selected="true">1. Alumnos</button>
+      <button type="button" class="tab" data-tab="preguntas" role="tab" aria-selected="false">2. Actividades</button>
+      <button type="button" class="tab" data-tab="preferencias" role="tab" aria-selected="false">3. Preferencias</button>
+      <button type="button" class="tab" data-tab="mapa" role="tab" aria-selected="false">4. Sociograma</button>
+    </nav>
+
+    <main>
+      <section id="panel-alumnos" class="panel active" role="tabpanel">
+        <h2>Lista de alumnos</h2>
+        <p class="hint">Un nombre por línea o separados por comas. Se eliminan duplicados y espacios sobrantes.</p>
+        <textarea id="alumnos-input" rows="10" placeholder="Ana García&#10;Luis Pérez&#10;María López"></textarea>
+        <div class="row">
+          <button type="button" id="btn-parse-alumnos" class="btn primary">Aplicar lista</button>
+          <button type="button" id="btn-clear-alumnos" class="btn">Vaciar</button>
+        </div>
+        <div id="alumnos-chips" class="chips"></div>
+        <p id="alumnos-count" class="meta"></p>
+      </section>
+
+      <section id="panel-preguntas" class="panel" role="tabpanel" hidden>
+        <h2>Cinco actividades (preguntas)</h2>
+        <p class="hint">Texto que verá cada alumno: “¿Con quién te gustaría compartir…?”</p>
+        <div id="preguntas-fields" class="stack"></div>
+      </section>
+
+      <section id="panel-preferencias" class="panel" role="tabpanel" hidden>
+        <h2>Preferencias por alumno</h2>
+        <p class="hint">Elige el alumno y marca uno o varios compañeros para cada actividad (puedes dejar actividades sin marcar).</p>
+        <div class="row wrap">
+          <label class="field">
+            <span>Alumno actual</span>
+            <select id="pref-alumno"></select>
+          </label>
+        </div>
+        <div id="pref-cuestionario" class="stack pref-blocks"></div>
+        <div class="row">
+          <button type="button" id="btn-guardar-pref" class="btn primary">Guardar preferencias de este alumno</button>
+        </div>
+      </section>
+
+      <section id="panel-mapa" class="panel" role="tabpanel" hidden>
+        <h2>Mapa / sociograma</h2>
+        <p class="hint">
+          Cada nodo: tamaño y color (azul frío → rojo cálido) según cuántas veces le eligieron en el grupo. Líneas: grosor, número y color según el peso del vínculo.
+          Activa “Mostrar dirección” para ver quién eligió a quién. Haz clic en el número de una línea para ver qué alumnos y en qué actividad eligieron esa conexión.
+        </p>
+        <div class="row wrap controls-map">
+          <label class="inline"><input type="checkbox" id="opt-dirigido" /> Mostrar dirección (flechas)</label>
+          <label class="inline"><input type="checkbox" id="opt-etiquetas" checked /> Etiquetas en aristas (peso)</label>
+          <button type="button" id="btn-fit" class="btn">Encajar vista</button>
+          <button type="button" id="btn-graph-fullscreen" class="btn" aria-pressed="false">Pantalla completa</button>
+          <button type="button" id="btn-export" class="btn">Exportar datos.json</button>
+          <label class="btn file-label">
+            Importar datos
+            <input type="file" id="import-file" accept="application/json" hidden />
+          </label>
+        </div>
+        <div id="graph-fullscreen-wrap" class="graph-fullscreen-wrap">
+          <div id="graph" class="graph-host"></div>
+          <p id="graph-legend" class="meta graph-legend-bar"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="dialog-edge-detalle" class="dialog-curso dialog-edge">
+    <h2 id="dialog-edge-titulo" class="dialog-title">Detalle del vínculo</h2>
+    <p id="dialog-edge-resumen" class="hint dialog-edge-resumen"></p>
+    <ul id="dialog-edge-lista" class="edge-detalle-lista"></ul>
+    <div class="row dialog-actions">
+      <button type="button" class="btn primary" id="dialog-edge-cerrar">Cerrar</button>
+    </div>
+  </dialog>
+
+  <dialog id="dialog-curso-nombre" class="dialog-curso">
+    <form method="dialog" id="form-curso-nombre">
+      <h2 id="dialog-curso-titulo" class="dialog-title">Nombre del curso</h2>
+      <input type="text" id="dialog-curso-input" class="dialog-input" required autocomplete="off" />
+      <div class="row dialog-actions">
+        <button type="submit" class="btn primary" value="ok">Aceptar</button>
+        <button type="button" class="btn" id="dialog-curso-cancelar">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

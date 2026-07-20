@@ -1,0 +1,2 @@
+v07 — Base antes de implementar ítem 15 (impresión/PDF)
+Incluye: archivado de eventos, notas al completar logística, panel estadístico y todos los anteriores.

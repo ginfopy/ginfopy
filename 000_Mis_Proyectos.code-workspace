@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "name": "Cronómetro cuenta atrás",
+      "path": "cronometro-cuenta-atras"
+    },
+    {
+      "name": "Planner",
+      "path": "planner-app"
+    }
+  ],
+  "settings": {}
+}

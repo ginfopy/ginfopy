@@ -1,0 +1,2 @@
+v08 — Base antes de implementar ítem 3 (notificaciones del navegador)
+Incluye: impresión/PDF, archivado, notas al completar, panel estadístico y todos los anteriores.

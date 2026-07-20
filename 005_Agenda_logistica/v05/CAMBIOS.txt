@@ -1,0 +1,2 @@
+v05 — Base antes de implementar ítem 2 (notas al completar logística)
+Incluye panel estadístico completo (ítems 8-13) y todos los anteriores.

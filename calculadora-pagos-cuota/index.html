@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de pagos a cuota</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Pagos a cuota</h1>
+      <p class="subtitle">Interés aplicado sobre el monto total; cada cuota lleva la misma cuota del total financiado.</p>
+    </header>
+
+    <section class="panel" aria-label="Datos de la cuenta">
+      <div class="fields">
+        <label>
+          <span>Monto total de la cuenta</span>
+          <input type="number" id="monto" min="0" step="0.01" value="1000" inputmode="decimal" />
+        </label>
+        <label>
+          <span>Cantidad de cuotas</span>
+          <input type="number" id="cuotas" min="1" step="1" value="12" inputmode="numeric" />
+        </label>
+        <label>
+          <span>Interés sobre el total (%)</span>
+          <input type="number" id="interes" min="0" step="0.01" value="10" inputmode="decimal" />
+        </label>
+      </div>
+    </section>
+
+    <section class="panel results" aria-live="polite" aria-label="Resultado">
+      <h2 class="results-title">Resumen</h2>
+      <dl class="summary">
+        <div class="row">
+          <dt>Monto en intereses</dt>
+          <dd id="outInteres">—</dd>
+        </div>
+        <div class="row">
+          <dt>Total a pagar</dt>
+          <dd id="outTotal">—</dd>
+        </div>
+        <div class="row highlight">
+          <dt>Valor de cada cuota</dt>
+          <dd id="outCuota">—</dd>
+        </div>
+      </dl>
+      <p class="formula" id="formulaNote"></p>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

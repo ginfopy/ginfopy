@@ -1,0 +1,116 @@
+{
+  "version": 2,
+  "cursoActivoId": "f63aa053-1684-4479-949f-e3dba299ab4c",
+  "cursos": [
+    {
+      "id": "84a7c2fa-fbe7-453e-85ab-8d1b9267bb9b",
+      "nombre": "1BTI",
+      "alumnos": [
+        "ana",
+        "luis",
+        "roberto"
+      ],
+      "preguntas": [
+        "un trabajo en grupo para la asignatura",
+        "una presentación oral",
+        "un proyecto de investigación",
+        "actividades extraescolares o deporte",
+        "estudio o preparación de exámenes"
+      ],
+      "preferences": {
+        "ana": {
+          "0": [
+            "luis"
+          ],
+          "1": [
+            "roberto"
+          ],
+          "2": [],
+          "3": [
+            "roberto"
+          ],
+          "4": [
+            "luis"
+          ]
+        },
+        "luis": {
+          "0": [
+            "roberto"
+          ],
+          "1": [
+            "ana"
+          ],
+          "2": [
+            "roberto"
+          ],
+          "3": [
+            "ana"
+          ],
+          "4": [
+            "roberto"
+          ]
+        },
+        "roberto": {
+          "0": [
+            "ana"
+          ],
+          "1": [
+            "ana"
+          ],
+          "2": [
+            "ana"
+          ],
+          "3": [
+            "luis"
+          ],
+          "4": [
+            "luis"
+          ]
+        }
+      },
+      "envios": {
+        "roberto": "2026-06-02T16:33:16.738Z"
+      }
+    },
+    {
+      "id": "f63aa053-1684-4479-949f-e3dba299ab4c",
+      "nombre": "2BTI",
+      "alumnos": [
+        "alberto",
+        "maria",
+        "juan"
+      ],
+      "preguntas": [
+        "un trabajo en grupo para la asignatura",
+        "una presentación oral",
+        "un proyecto de investigación",
+        "actividades extraescolares o deporte",
+        "estudio o preparación de exámenes"
+      ],
+      "preferences": {
+        "alberto": {
+          "0": [],
+          "1": [],
+          "2": [],
+          "3": [],
+          "4": []
+        },
+        "maria": {
+          "0": [],
+          "1": [],
+          "2": [],
+          "3": [],
+          "4": []
+        },
+        "juan": {
+          "0": [],
+          "1": [],
+          "2": [],
+          "3": [],
+          "4": []
+        }
+      },
+      "envios": {}
+    }
+  ]
+}
