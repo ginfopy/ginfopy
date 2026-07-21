@@ -1,0 +1,812 @@
+/* ==========================================================================
+   CONFIGURACIÓN GLOBAL Y VARIABLES (DISEÑO PREMIUM)
+   ========================================================================== */
+:root {
+    /* Paleta de colores - Modo Oscuro Elegante */
+    --bg-app: #08090c;
+    --bg-sidebar: #0e1017;
+    --bg-card: rgba(22, 26, 38, 0.65);
+    --bg-card-hover: rgba(28, 33, 48, 0.85);
+    --bg-input: #121622;
+    --border-color: rgba(255, 255, 255, 0.07);
+    --border-color-focus: rgba(99, 102, 241, 0.4);
+    
+    /* Colores del Estado de Tareas */
+    --color-todo: #3b82f6;       /* Azul */
+    --color-inprogress: #a855f7; /* Púrpura */
+    --color-inreview: #f59e0b;   /* Ámbar */
+    --color-done: #10b981;       /* Esmeralda */
+    
+    /* Colores de Prioridad */
+    --priority-high: #ef4444;    /* Rojo */
+    --priority-medium: #f97316;  /* Naranja */
+    --priority-low: #10b981;     /* Verde */
+    
+    /* Colores de Texto */
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --text-light: #6b7280;
+    
+    /* Tipografía y sombras */
+    --font-primary: 'Outfit', sans-serif;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    
+    /* Transiciones */
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset de estilos básicos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    overflow: hidden; /* Evitamos scroll general; manejamos scroll dentro del panel principal */
+    height: 100vh;
+}
+
+/* ==========================================================================
+   ESTRUCTURA GENERAL (LAYOUT APP)
+   ========================================================================== */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ==========================================================================
+   PANEL LATERAL (SIDEBAR)
+   ========================================================================== */
+.sidebar {
+    width: 260px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    flex-shrink: 0;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.logo-icon {
+    font-size: 32px;
+    color: #6366f1; /* Gradiente simulado con color vibrante */
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-logo h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: auto; /* Empuja las estadísticas al final del sidebar */
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+
+.menu-item:hover {
+    color: var(--text-main);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.menu-item.active {
+    color: #ffffff;
+    background-color: rgba(99, 102, 241, 0.15);
+    border-left: 3px solid #6366f1;
+}
+
+.menu-item .material-symbols-outlined {
+    font-size: 22px;
+}
+
+/* Estadísticas en Sidebar */
+.sidebar-stats {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-top: 24px;
+}
+
+.sidebar-stats h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.stat-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.stat-box:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.stat-value {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.text-red {
+    color: var(--priority-high);
+}
+
+.text-green {
+    color: var(--color-done);
+}
+
+/* ==========================================================================
+   CONTENIDO PRINCIPAL (HEADER Y BOARD)
+   ========================================================================== */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Mantenemos el scroll controlado por las columnas */
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.03) 0%, rgba(8, 9, 12, 1) 50%);
+}
+
+/* Barra superior (Header) */
+.main-header {
+    height: 80px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    flex-shrink: 0;
+}
+
+.header-search {
+    position: relative;
+    width: 320px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    pointer-events: none;
+    font-size: 20px;
+}
+
+.header-search input {
+    width: 100%;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px 10px 42px;
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition-fast);
+}
+
+.header-search input:focus {
+    border-color: var(--border-color-focus);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.filter-dropdown select {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.filter-dropdown select:focus {
+    border-color: var(--border-color-focus);
+}
+
+/* Botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition-fast);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   TABLERO KANBAN Y COLUMNAS
+   ========================================================================== */
+.kanban-board {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 24px 32px;
+    overflow-x: auto; /* Permite scroll horizontal si la pantalla es muy pequeña */
+}
+
+.board-column {
+    background-color: rgba(14, 16, 23, 0.45);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 250px;
+    padding: 16px;
+    transition: var(--transition-normal);
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 4px 6px;
+}
+
+.column-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.column-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.indicator-todo { background-color: var(--color-todo); }
+.indicator-inprogress { background-color: var(--color-inprogress); }
+.indicator-inreview { background-color: var(--color-inreview); }
+.indicator-done { background-color: var(--color-done); }
+
+.column-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.column-count {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.column-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-print-column {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    transition: var(--transition-fast);
+}
+
+.btn-print-column:hover {
+    color: var(--text-main);
+    background-color: rgba(255, 255, 255, 0.06);
+    transform: scale(1.05);
+}
+
+.btn-print-column .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Zona de colocación de tarjetas (Listas) */
+.task-list {
+    flex-grow: 1;
+    overflow-y: auto; /* Habilitamos scroll vertical propio */
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 100px;
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+}
+
+/* Ocultamos las barras de scroll feas en navegadores modernos */
+.task-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.task-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.task-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Estado activo de arrastre sobre la columna */
+.task-list.drag-over {
+    background-color: rgba(99, 102, 241, 0.04);
+    outline: 2px dashed rgba(99, 102, 241, 0.3);
+    outline-offset: -2px;
+}
+
+/* ==========================================================================
+   TARJETAS DE TAREA (CARDS)
+   ========================================================================== */
+.task-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    cursor: grab;
+    user-select: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                border-color var(--transition-fast),
+                background-color var(--transition-fast);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.task-card:hover {
+    background-color: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.task-card:active {
+    cursor: grabbing;
+}
+
+/* Estilo cuando arrastramos la tarjeta */
+.task-card.dragging {
+    opacity: 0.3;
+    transform: scale(0.96);
+    border: 1px dashed #6366f1;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.card-priority {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.priority-high {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: var(--priority-high);
+}
+
+.priority-medium {
+    background-color: rgba(249, 115, 22, 0.15);
+    color: var(--priority-medium);
+}
+
+.priority-low {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: var(--priority-low);
+}
+
+/* Menú de acciones rápidas de la tarjeta (Editar/Eliminar) */
+.card-actions-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+}
+
+.card-actions-btn:hover {
+    color: var(--text-main);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.task-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.task-card p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Trunca a dos líneas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+/* Footer de tarjeta (Etiquetas y Fecha) */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-top: 12px;
+    gap: 8px;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.tag {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--text-muted);
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.card-due-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.card-due-date .material-symbols-outlined {
+    font-size: 14px;
+}
+
+/* Indicación de vencido */
+.date-overdue {
+    color: var(--priority-high);
+}
+
+/* ==========================================================================
+   DIÁLOGO MODAL (FORMULARIO)
+   ========================================================================== */
+.modal {
+    border: none;
+    background: transparent;
+    padding: 0;
+    max-width: 520px;
+    width: 90%;
+    margin: auto;
+    outline: none;
+}
+
+/* Efecto de fondo desenfocado (backdrop) */
+.modal::backdrop {
+    background-color: rgba(5, 6, 8, 0.7);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.25s ease-out;
+}
+
+.modal-content {
+    background-color: #0f111a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 28px;
+    transform: translateY(20px);
+    transition: transform var(--transition-normal);
+}
+
+/* Clase para la animación al abrir el modal */
+.modal[open] .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    transition: var(--transition-fast);
+}
+
+.btn-close:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+select,
+textarea,
+input[type="date"] {
+    width: 100%;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition-fast);
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus,
+input[type="date"]:focus {
+    border-color: var(--border-color-focus);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* Cambiar estilo nativo del selector de fecha */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Estilos Premium para la barra deslizante (input range) */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+    margin: 16px 0;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #6366f1;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    transition: var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: #818cf8;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #6366f1;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    border: none;
+    transition: var(--transition-fast);
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    background: #818cf8;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+/* ==========================================================================
+   ANIMACIONES
+   ========================================================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilo responsivo simple para tabletas y móviles */
+@media (max-width: 1024px) {
+    .kanban-board {
+        grid-template-columns: repeat(2, 1fr);
+        overflow-y: auto;
+    }
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px 24px;
+    }
+    .sidebar-logo {
+        margin-bottom: 16px;
+    }
+    .sidebar-menu {
+        flex-direction: row;
+        margin-bottom: 16px;
+    }
+    .sidebar-stats {
+        display: none; /* Ocultamos estadísticas en móvil por espacio */
+    }
+    body {
+        overflow: auto;
+    }
+    .main-content {
+        height: calc(100vh - 120px);
+    }
+}
+
+@media (max-width: 600px) {
+    .kanban-board {
+        grid-template-columns: 1fr;
+    }
+    .main-header {
+        flex-direction: column;
+        height: auto;
+        padding: 16px;
+        gap: 12px;
+        align-items: stretch;
+    }
+    .header-search {
+        width: 100%;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

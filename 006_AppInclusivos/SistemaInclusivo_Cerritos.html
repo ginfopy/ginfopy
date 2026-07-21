@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inclusivo — Colegio Presbiteriano Cerritos</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root { --azul-osc:#1F3864; --azul-med:#2E75B6; --azul-clar:#DEEAF1; }
+*{box-sizing:border-box;}
+body{background:#eef2f7;font-family:Arial,sans-serif;margin:0;}
+
+/* SIDEBAR */
+#sidebar{width:230px;min-height:100vh;background:var(--azul-osc);position:fixed;top:0;left:0;z-index:200;display:flex;flex-direction:column;overflow-y:auto;}
+#sidebar .brand{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.12);}
+#sidebar .brand .inst{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+#sidebar .brand .name{color:#fff;font-size:14px;font-weight:700;line-height:1.2;}
+#sidebar .brand .sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px;}
+#sidebar .nav-section{font-size:10px;color:rgba(255,255,255,.35);padding:14px 14px 4px;letter-spacing:.8px;text-transform:uppercase;}
+#sidebar a.nav-link{color:rgba(255,255,255,.72);padding:9px 14px;display:flex;align-items:center;gap:10px;font-size:13px;border-radius:0;transition:.15s;cursor:pointer;text-decoration:none;}
+#sidebar a.nav-link:hover,#sidebar a.nav-link.active{background:var(--azul-med);color:#fff;}
+#sidebar a.nav-link i{font-size:15px;width:18px;flex-shrink:0;}
+#sidebar .footer{margin-top:auto;padding:12px 14px;font-size:10px;color:rgba(255,255,255,.35);border-top:1px solid rgba(255,255,255,.1);}
+
+/* MAIN */
+#main{margin-left:230px;min-height:100vh;}
+.page{display:none;padding:22px 24px;}
+.page.active{display:block;}
+
+/* PAGE TITLE */
+.page-title{background:var(--azul-osc);color:#fff;padding:13px 18px;border-radius:8px;margin-bottom:18px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.page-title .badge-norm{font-size:10px;font-weight:normal;background:rgba(255,255,255,.15);padding:3px 8px;border-radius:20px;margin-left:auto;}
+
+/* STAT CARDS */
+.stat-card{background:#fff;border-radius:8px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.07);border-left:4px solid var(--azul-med);cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;user-select:none;}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.14);background:#f7fbff;}
+.stat-card:active{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.1);}
+.stat-card .num{font-size:1.9rem;font-weight:700;line-height:1;}
+.stat-card .lbl{font-size:11px;color:#666;margin-top:5px;}
+.stat-card .hint{font-size:10px;color:#2E75B6;margin-top:6px;opacity:0;transition:opacity .15s;}
+.stat-card:hover .hint{opacity:1;}
+.stat-card i{font-size:1.8rem;opacity:.6;}
+@keyframes flashAlert{0%{background:#fff3cd}60%{background:#fff3cd}100%{background:transparent}}
+.flash-alert{animation:flashAlert 1.5s ease-out;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .8s linear infinite;}
+
+/* TABLES */
+.table-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.07);overflow:hidden;}
+.table-card .table{margin:0;font-size:12.5px;}
+.table-card .table thead th{background:var(--azul-med);color:#fff;font-weight:600;font-size:11.5px;white-space:nowrap;border:none;padding:9px 10px;}
+.table-card .table tbody td{padding:7px 10px;vertical-align:middle;}
+.table-card .table tbody tr:nth-child(even){background:#f8f9fa;}
+.table-card .table tbody tr:hover{background:#e8f0fb !important;}
+
+/* ALERT ROWS */
+.row-vencido{background:#FCE4D6 !important;}
+.row-urgente{background:#FCE9D9 !important;}
+.row-proximo{background:#FFF9CC !important;}
+
+/* BADGES */
+.bd-vencido{background:#FCE4D6;color:#C00000;border:1px solid #C00000;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-urgente{background:#FCE9D9;color:#C55A11;border:1px solid #C55A11;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-proximo{background:#FFF2CC;color:#7F6000;border:1px solid #BF9000;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-ok{background:#E2EFDA;color:#375623;border:1px solid #375623;font-weight:700;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+.bd-nf{background:#e9ecef;color:#666;border:1px solid #ccc;font-size:11px;padding:3px 7px;border-radius:12px;white-space:nowrap;}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.toolbar input,.toolbar select{font-size:12.5px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;outline:none;}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--azul-med);}
+.btn-add{background:var(--azul-med);color:#fff;border:none;padding:7px 15px;border-radius:6px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;}
+.btn-add:hover{background:var(--azul-osc);}
+.btn-edit{background:#e3f0ff;border:1px solid var(--azul-med);color:var(--azul-med);padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;}
+.btn-del{background:#fce4d6;border:1px solid #c00;color:#c00;padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;}
+.btn-print{background:#fff;border:1px solid #ccc;color:#333;padding:7px 13px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.btn-print:hover{background:#f0f0f0;}
+
+/* MODAL */
+.modal-header{background:var(--azul-osc);color:#fff;}
+.modal-header .btn-close{filter:invert(1);}
+.form-label{font-size:11.5px;font-weight:600;color:#333;margin-bottom:3px;}
+.form-control,.form-select{font-size:12.5px;}
+
+/* PROGRESS BARS */
+.pct-bar{height:8px;border-radius:4px;background:#e9ecef;overflow:hidden;width:70px;display:inline-block;vertical-align:middle;margin-left:5px;}
+.pct-bar-fill{height:100%;border-radius:4px;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px 20px;color:#999;}
+.empty-state i{font-size:3rem;margin-bottom:12px;display:block;}
+
+/* NORMATIVA BOX */
+.norm-box{background:#f0f7ff;border:1px solid #bdd7ee;border-radius:6px;padding:10px 14px;font-size:11px;color:#1F3864;margin-bottom:14px;}
+.norm-box strong{display:block;margin-bottom:4px;}
+
+@media print{
+  #sidebar{display:none;}
+  #main{margin-left:0;}
+  .toolbar,.btn-add,.btn-edit,.btn-del,.btn-print,.modal{display:none!important;}
+  .page{display:block!important;padding:10px;}
+}
+
+/* ── MÓDULO CASOS ANEAE ─────────────────────────────────── */
+.paso-timeline{display:flex;gap:0;padding:6px 0 12px;overflow-x:auto;}
+.paso-item{flex:1;min-width:72px;text-align:center;position:relative;cursor:pointer;}
+.paso-item:not(:last-child)::after{content:'';position:absolute;top:15px;left:50%;width:100%;height:2px;background:#dee2e6;z-index:0;}
+.paso-circle{width:30px;height:30px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;position:relative;z-index:1;border:2px solid transparent;}
+.paso-label{font-size:9px;color:#666;line-height:1.2;max-width:68px;margin:0 auto;}
+.paso-pendiente .paso-circle{background:#f0f4f8;color:#888;border-color:#dee2e6;}
+.paso-proceso .paso-circle{background:#2E75B6;color:#fff;border-color:#1F3864;}
+.paso-completado .paso-circle{background:#375623;color:#fff;border-color:#2a4019;}
+.paso-completado::after{background:#375623 !important;}
+.paso-vencido .paso-circle{background:#C00000;color:#fff;border-color:#8B0000;}
+.paso-mediacion .paso-circle{background:#C55A11;color:#fff;border-color:#8B3E0B;}
+
+.semaf-verde{background:#E2EFDA;color:#375623;border:1px solid #375623;font-weight:700;font-size:11px;padding:2px 8px;border-radius:12px;}
+.semaf-amarillo{background:#FFF2CC;color:#7F6000;border:1px solid #BF9000;font-weight:700;font-size:11px;padding:2px 8px;border-radius:12px;}
+.semaf-rojo{background:#FCE4D6;color:#C00000;border:1px solid #C00000;font-weight:700;font-size:11px;padding:2px 8px;border-radius:12px;}
+.semaf-gris{background:#e9ecef;color:#666;border:1px solid #ccc;font-size:11px;padding:2px 8px;border-radius:12px;}
+
+.funnel-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.funnel-label{width:160px;font-size:11px;color:#333;text-align:right;flex-shrink:0;}
+.funnel-bar-wrap{flex:1;background:#f0f4f8;border-radius:4px;height:18px;overflow:hidden;}
+.funnel-bar{height:18px;background:var(--azul-med);border-radius:4px;min-width:4px;transition:width .4s;}
+.funnel-count{font-size:11px;font-weight:700;color:var(--azul-osc);width:28px;text-align:right;flex-shrink:0;}
+
+.tipo-badge-sig{background:#FCE4D6;color:#C00000;border:1px solid #C00000;font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;}
+.tipo-badge-nosig{background:#DEEAF1;color:#2E75B6;border:1px solid #2E75B6;font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;}
+
+.instr-check{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;}
+.instr-check input[type=checkbox]{width:16px;height:16px;accent-color:#375623;cursor:pointer;}
+.instr-ok{color:#375623;font-weight:600;}
+.instr-pend{color:#888;}
+
+.kpi-caso{background:#fff;border-radius:8px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.07);border-left:4px solid var(--azul-med);cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.kpi-caso:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.12);}
+.kpi-caso .n{font-size:1.8rem;font-weight:700;line-height:1;}
+.kpi-caso .l{font-size:11px;color:#666;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<div id="sidebar">
+  <div class="brand">
+    <div class="inst">Sistema Educativo</div>
+    <div class="name">Colegio Presbiteriano<br>Cerritos</div>
+    <div class="sub">Gestión de Educación Inclusiva</div>
+  </div>
+  <div class="nav-section">Gestión ANEAE</div>
+  <a class="nav-link active" onclick="showPage('dashboard')"><i class="bi bi-speedometer2"></i>Tablero Gerencial</a>
+  <a class="nav-link" onclick="showPage('casos')"><i class="bi bi-diagram-3-fill"></i>Casos — 9 Pasos</a>
+  <a class="nav-link" onclick="showPage('alumnos')"><i class="bi bi-people-fill"></i>Alumnos Inclusivos</a>
+  <a class="nav-link" onclick="showPage('familias')"><i class="bi bi-handshake-fill"></i>Compromisos Familias</a>
+  <div class="nav-section">Normativa</div>
+  <a class="nav-link" onclick="showPage('documentos')"><i class="bi bi-file-earmark-text-fill"></i>Documentos MEC</a>
+  <a class="nav-link" onclick="showPage('seguimiento')"><i class="bi bi-graph-up-arrow"></i>Seguimiento Académico</a>
+  <a class="nav-link" onclick="showPage('calendario')"><i class="bi bi-calendar3"></i>Calendario 2026</a>
+  <div class="nav-section">Sistema</div>
+  <a class="nav-link" onclick="exportarDatos()"><i class="bi bi-download"></i>Exportar datos</a>
+  <a class="nav-link" onclick="importarDatos()"><i class="bi bi-upload"></i>Importar datos</a>
+  <input type="file" id="import-input" accept=".json" style="display:none" onchange="cargarArchivo(event)">
+  <div class="footer">
+    <div style="background:rgba(255,255,255,.06);border-radius:6px;padding:8px 10px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span id="file-status-icon" style="font-size:14px;flex-shrink:0"><i class="bi bi-circle text-secondary"></i></span>
+        <span style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px">Archivo de datos</span>
+      </div>
+      <div id="file-status-name" style="font-size:11px;color:rgba(255,255,255,.8);word-break:break-all;line-height:1.3">Sin archivo conectado</div>
+      <a onclick="cambiarArchivo()" style="font-size:10px;color:#7fb3d9;cursor:pointer;margin-top:4px;display:inline-block">Cambiar archivo…</a>
+    </div>
+    <strong style="font-size:11px">Lic. Rodrigo Godoy</strong><br>
+    <span style="font-size:10px;opacity:.5">Director Nivel Secundario · 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div id="main">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-title">
+      <i class="bi bi-speedometer2"></i>Panel de Alertas — Educación Inclusiva
+      <span class="badge-norm" id="dash-fecha"></span>
+    </div>
+    <div class="row g-3 mb-4" id="stats-row"></div>
+    <div class="table-card p-3 mb-3">
+      <h6 style="color:var(--azul-osc);font-weight:700;border-bottom:2px solid var(--azul-med);padding-bottom:6px;margin-bottom:12px">
+        <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Vencidos y Próximos a Vencer (≤ 30 días)
+      </h6>
+      <div id="alert-table"></div>
+    </div>
+    <div class="norm-box">
+      <strong><i class="bi bi-bookmark-fill me-1"></i>Normativa de referencia</strong>
+      Ley N° 5136/2013 — Educación Inclusiva &nbsp;|&nbsp; Res. MEC N° 29.664/2012 &nbsp;|&nbsp; Decreto N° 1.350/2019 &nbsp;|&nbsp; Res. N° 29.451/2010 &nbsp;|&nbsp; Ley N° 4962/2013 (SENADIS)
+    </div>
+  </div>
+
+  <!-- CASOS ANEAE -->
+  <div id="page-casos" class="page">
+    <div class="page-title"><i class="bi bi-diagram-3-fill"></i>Casos ANEAE — Proceso de Ajustes Razonables (9 Pasos) <span id="cnt-casos" class="badge-norm"></span></div>
+    <div class="norm-box"><strong><i class="bi bi-bookmark-fill me-1"></i>Base normativa</strong>
+      Orientaciones Técnicas MEC (marzo 2025) · Ley N° 5136/2013 · Decreto N° 2837/2014 — Los plazos se calculan en <strong>días hábiles</strong></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalCaso()"><i class="bi bi-plus-lg"></i>Nuevo Caso</button>
+      <input type="text" id="q-casos" placeholder="🔍 Buscar alumno..." oninput="renderCasos()" style="width:200px">
+      <select id="f-tipo-caso" onchange="renderCasos()" style="width:160px">
+        <option value="">Todos los tipos</option>
+        <option>Significativo</option><option>No Significativo</option>
+      </select>
+      <select id="f-estado-caso" onchange="renderCasos()" style="width:180px">
+        <option value="">Todos los estados</option>
+        <option>Identificado</option><option>Diseñado</option><option>Validado</option>
+        <option>Acordado</option><option>En Implementación</option>
+        <option>Presentado a Supervisión</option><option>Aprobado</option>
+        <option>Evaluado</option><option>Promovido</option><option>En Mediación</option>
+      </select>
+      <select id="f-ciclo-caso" onchange="renderCasos()" style="width:155px">
+        <option value="">Todos los ciclos</option>
+        <option>Inicial</option><option>Primer Ciclo</option><option>Segundo Ciclo</option>
+        <option>Tercer Ciclo</option><option>Nivel Medio</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-casos"></div></div>
+  </div>
+
+  <!-- ALUMNOS -->
+  <div id="page-alumnos" class="page">
+    <div class="page-title"><i class="bi bi-people-fill"></i>Registro de Alumnos Inclusivos <span id="cnt-alumnos" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalAlumno()"><i class="bi bi-plus-lg"></i>Agregar Alumno</button>
+      <input type="text" id="q-alumnos" placeholder="🔍 Buscar por nombre..." oninput="renderAlumnos()" style="width:210px">
+      <select id="f-turno-alu" onchange="renderAlumnos()" style="width:130px">
+        <option value="">Todos los turnos</option>
+        <option>Mañana</option><option>Tarde</option><option>Tiempo Completo</option>
+      </select>
+      <select id="f-estado-alu" onchange="renderAlumnos()" style="width:140px">
+        <option value="">Todos los estados</option>
+        <option>Activo</option><option>Egresado</option><option>Trasladado</option><option>Retirado</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-alumnos"></div></div>
+  </div>
+
+  <!-- FAMILIAS -->
+  <div id="page-familias" class="page">
+    <div class="page-title"><i class="bi bi-handshake-fill"></i>Compromisos y Acuerdos con Familias <span id="cnt-familias" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalFamilia()"><i class="bi bi-plus-lg"></i>Agregar Compromiso</button>
+      <input type="text" id="q-familias" placeholder="🔍 Buscar alumno..." oninput="renderFamilias()" style="width:210px">
+      <select id="f-estado-fam" onchange="renderFamilias()" style="width:150px">
+        <option value="">Todos los estados</option>
+        <option>Pendiente</option><option>Cumplido</option><option>Reprogramado</option><option>Incumplido</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-familias"></div></div>
+  </div>
+
+  <!-- DOCUMENTOS MEC -->
+  <div id="page-documentos" class="page">
+    <div class="page-title"><i class="bi bi-file-earmark-text-fill"></i>Documentos y Plazos — MEC Paraguay <span id="cnt-docs" class="badge-norm"></span></div>
+    <div class="norm-box" style="margin-bottom:12px">
+      <strong><i class="bi bi-info-circle me-1"></i>Base normativa para estos documentos</strong>
+      Ley 5136/2013 Art. 15-16 &nbsp;|&nbsp; Res. MEC 29.664/2012 Arts. 8 y 12 &nbsp;|&nbsp; Decreto 1.350/2019 Arts. 22 y 30 &nbsp;|&nbsp; Res. 29.451/2010
+    </div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalDocumento()"><i class="bi bi-plus-lg"></i>Agregar Documento</button>
+      <input type="text" id="q-docs" placeholder="🔍 Buscar documento..." oninput="renderDocumentos()" style="width:230px">
+      <select id="f-estado-docs" onchange="renderDocumentos()" style="width:160px">
+        <option value="">Todos los estados</option>
+        <option>Pendiente</option><option>En preparación</option><option>Presentado</option><option>Aprobado</option><option>Observado</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-documentos"></div></div>
+  </div>
+
+  <!-- SEGUIMIENTO -->
+  <div id="page-seguimiento" class="page">
+    <div class="page-title"><i class="bi bi-graph-up-arrow"></i>Seguimiento Académico Individual <span id="cnt-seg" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalSeguimiento()"><i class="bi bi-plus-lg"></i>Agregar Registro</button>
+      <input type="text" id="q-seg" placeholder="🔍 Buscar alumno..." oninput="renderSeguimiento()" style="width:210px">
+      <select id="f-trim" onchange="renderSeguimiento()" style="width:155px">
+        <option value="">Todos los períodos</option>
+        <option>1er Trimestre</option><option>2do Trimestre</option><option>3er Trimestre</option><option>Semestral</option><option>Anual</option>
+      </select>
+      <select id="f-materia" onchange="renderSeguimiento()" style="width:160px">
+        <option value="">Todas las materias</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-seguimiento"></div></div>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div id="page-calendario" class="page">
+    <div class="page-title"><i class="bi bi-calendar3"></i>Calendario Anual 2026 — Educación Inclusiva <span id="cnt-cal" class="badge-norm"></span></div>
+    <div class="toolbar">
+      <button class="btn-add" onclick="modalCalendario()"><i class="bi bi-plus-lg"></i>Agregar Evento</button>
+      <select id="f-mes-cal" onchange="renderCalendario()" style="width:140px">
+        <option value="">Todos los meses</option>
+        <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+        <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+        <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+      </select>
+      <select id="f-estado-cal" onchange="renderCalendario()" style="width:150px">
+        <option value="">Todos los estados</option>
+        <option>Pendiente</option><option>En proceso</option><option>Completado</option><option>Reprogramado</option>
+      </select>
+      <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i>Imprimir</button>
+    </div>
+    <div class="table-card"><div id="table-calendario"></div></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ MODAL UNIVERSAL ═══════════════ -->
+<div class="modal fade" id="mainModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary btn-sm" id="modalSave" style="background:var(--azul-med);border-color:var(--azul-med)">
+          <i class="bi bi-floppy"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+// ════════════════════════════════════════════════
+// DATOS EN MEMORIA + GUARDADO EN ARCHIVO JSON
+// ════════════════════════════════════════════════
+const _mem = { alumnos:[], familias:[], documentos:[], seguimiento:[], calendario:[] };
+
+const DB = {
+  get:   k => _mem[k] || [],
+  add(k, item) {
+    (_mem[k] = _mem[k]||[]).push({...item, id:Date.now()+'_'+Math.random().toString(36).slice(2,7)});
+    autoSave();
+  },
+  update(k, id, item) {
+    const d=_mem[k]||[]; const i=d.findIndex(x=>x.id==id);
+    if (i>=0) { d[i]={...item,id}; } autoSave();
+  },
+  del(k, id) { _mem[k]=(_mem[k]||[]).filter(x=>x.id!=id); autoSave(); },
+  byId(k, id) { return (_mem[k]||[]).find(x=>x.id==id); },
+};
+
+// ── IndexedDB: persiste el file handle entre sesiones ──────────
+async function idbOp(mode, val) {
+  return new Promise(res => {
+    const req = indexedDB.open('CerritosIDB',1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('h');
+    req.onsuccess = e => {
+      const tx = e.target.result.transaction('h', mode);
+      const r  = mode==='readwrite' ? tx.objectStore('h').put(val,'main') : tx.objectStore('h').get('main');
+      r.onsuccess = () => res(r.result);
+      r.onerror   = () => res(null);
+    };
+    req.onerror = () => res(null);
+  });
+}
+
+// ── File System Access API ─────────────────────────────────────
+let _fileHandle = null;
+let _saveTimer  = null;
+let _saveStatus = 'idle'; // 'idle'|'saving'|'ok'|'error'
+
+async function writeFile() {
+  if (!_fileHandle) return;
+  try {
+    const writable = await _fileHandle.createWritable();
+    await writable.write(JSON.stringify({
+      alumnos:_mem.alumnos, familias:_mem.familias,
+      documentos:_mem.documentos, seguimiento:_mem.seguimiento,
+      calendario:_mem.calendario, _guardado:new Date().toISOString(), _version:'1.0',
+    }, null, 2));
+    await writable.close();
+    _saveStatus = 'ok';
+  } catch(e) {
+    _saveStatus = 'error';
+    console.error('Error al guardar:', e);
+  }
+  updateFileStatus();
+}
+
+function autoSave() {
+  _saveStatus = 'saving';
+  updateFileStatus();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(writeFile, 400);
+}
+
+async function readFile(handle) {
+  const file = await handle.getFile();
+  const text = await file.text();
+  const data = JSON.parse(text);
+  Object.assign(_mem, {
+    alumnos:    data.alumnos    || [],
+    familias:   data.familias   || [],
+    documentos: data.documentos || [],
+    seguimiento:data.seguimiento|| [],
+    calendario: data.calendario || [],
+  });
+}
+
+function updateFileStatus() {
+  const elNom  = document.getElementById('file-status-name');
+  const elIcon = document.getElementById('file-status-icon');
+  if (!elNom) return;
+  if (!_fileHandle) {
+    elNom.textContent  = 'Sin archivo conectado';
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-exclamation-circle" style="color:#f0ad4e"></i>';
+    return;
+  }
+  elNom.textContent = _fileHandle.name;
+  if (_saveStatus==='saving') {
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-arrow-repeat spin" style="color:#7fb3d9"></i>';
+  } else if (_saveStatus==='error') {
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-x-circle" style="color:#f77"></i>';
+  } else {
+    if (elIcon) elIcon.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#6dbf67"></i>';
+  }
+}
+
+async function conectarArchivo(crear) {
+  if (!window.showOpenFilePicker) {
+    alert('Tu navegador no soporta acceso directo a archivos.\nUsá Google Chrome o Microsoft Edge.');
+    return false;
+  }
+  try {
+    const opts = {
+      types:[{description:'Datos Inclusivo Cerritos',accept:{'application/json':['.json']}}],
+      suggestedName:'datos_inclusivo_cerritos.json',
+    };
+    _fileHandle = crear
+      ? await window.showSaveFilePicker(opts)
+      : (await window.showOpenFilePicker(opts))[0];
+    await idbOp('readwrite', _fileHandle);
+    if (crear) { await writeFile(); }
+    else       { await readFile(_fileHandle); }
+    return true;
+  } catch(e) {
+    if (e.name !== 'AbortError') console.error(e);
+    return false;
+  }
+}
+
+async function tryReconnect() {
+  try {
+    const stored = await idbOp('readonly');
+    if (!stored) return false;
+    const perm = await stored.queryPermission({mode:'readwrite'});
+    if (perm === 'granted') { _fileHandle=stored; await readFile(_fileHandle); return true; }
+    if (perm === 'prompt')  {
+      const req = await stored.requestPermission({mode:'readwrite'});
+      if (req === 'granted') { _fileHandle=stored; await readFile(_fileHandle); return true; }
+    }
+  } catch(e) { /* no pasa nada */ }
+  return false;
+}
+
+async function arrancarConArchivo(crear) {
+  const msg = document.getElementById('startup-msg');
+  if (msg) msg.textContent = crear ? 'Elegí dónde guardar el archivo nuevo…' : 'Seleccioná el archivo de datos…';
+  const ok = await conectarArchivo(crear);
+  if (ok) {
+    migrarDatos(); // normaliza datos legacy
+    preload();
+    updateFileStatus();
+    renderDashboard();
+    const ov = document.getElementById('startup-overlay');
+    if (ov) ov.remove();
+  } else {
+    if (msg) msg.textContent = 'No se seleccionó ningún archivo. Intentá de nuevo.';
+  }
+}
+
+async function cambiarArchivo() {
+  if (!confirm('¿Cambiar el archivo de datos? Los datos no guardados en el archivo actual se perderán.')) return;
+  const ok = await conectarArchivo(false);
+  if (ok) { updateFileStatus(); renderDashboard(); }
+}
+
+// ════════════════════════════════════════════════
+// INTEGRIDAD REFERENCIAL — alumnos como fuente de verdad
+// CI es la clave foránea que vincula todas las colecciones
+// ════════════════════════════════════════════════
+
+function getAlumnoByCi(ci) {
+  if (!ci) return null;
+  const norm = String(ci).replace(/[.\s-]/g,'');
+  return DB.get('alumnos').find(a => String(a.ci||'').replace(/[.\s-]/g,'') === norm) || null;
+}
+
+function nomAlumno(ci, fallback='—') {
+  const a = getAlumnoByCi(ci);
+  return a ? (a.apellidoNombre||fallback) : fallback;
+}
+
+// Widget reutilizable: selector de alumno por CI con autocompletado
+// Devuelve el HTML del campo + datalist; onchange llama fillAlumno(prefijo)
+function selectorAlumnoHTML(prefijo, ciActual) {
+  const alumnos = DB.get('alumnos').filter(a=>a.ci);
+  return `
+    <div class="col-md-4">
+      <label class="form-label">CI del Alumno *</label>
+      <input class="form-control" id="${prefijo}_ci" list="${prefijo}_dl"
+             value="${ciActual||''}" placeholder="Ej: 4.123.456"
+             oninput="fillAlumno('${prefijo}')">
+      <datalist id="${prefijo}_dl">
+        ${alumnos.map(a=>`<option value="${a.ci}">${a.apellidoNombre||''}</option>`).join('')}
+      </datalist>
+      <div id="${prefijo}_msg" style="font-size:10px;min-height:12px;margin-top:2px"></div>
+    </div>
+    <div class="col-md-8">
+      <label class="form-label">Datos del alumno <span style="font-size:10px;color:#2E75B6;font-weight:normal">— cargado automáticamente</span></label>
+      <div id="${prefijo}_card" style="background:#f0f4f8;border-radius:6px;padding:8px 12px;font-size:11.5px;color:#1F3864;min-height:36px">
+        ${ciActual ? _cardAlumnoInline(ciActual) : '<span style="color:#aaa">Ingresá la CI para cargar los datos</span>'}
+      </div>
+    </div>`;
+}
+
+function _cardAlumnoInline(ci) {
+  const a = getAlumnoByCi(ci); if (!a) return '<span style="color:#C55A11">⚠ CI no encontrada en Alumnos Inclusivos</span>';
+  return `<strong>${a.apellidoNombre||'—'}</strong> &nbsp;·&nbsp;
+    ${a.curso||'—'} (${a.ciclo||a.turno||'—'}) &nbsp;·&nbsp;
+    Adec: <strong>${(a.tipoAdecuacion||'—').replace('Adecuación ','Adec. ')}</strong> &nbsp;·&nbsp;
+    📞 ${a.telFamilia||'Sin tel.'}`;
+}
+
+// Llamado por oninput del selectorAlumno
+function fillAlumno(prefijo) {
+  const ci  = (document.getElementById(prefijo+'_ci')?.value||'').trim();
+  const card= document.getElementById(prefijo+'_card');
+  const msg = document.getElementById(prefijo+'_msg');
+  if (!ci) {
+    if(card) card.innerHTML='<span style="color:#aaa">Ingresá la CI para cargar los datos</span>';
+    if(msg) msg.textContent='';
+    return;
+  }
+  const a = getAlumnoByCi(ci);
+  if (a) {
+    if(card) card.innerHTML = _cardAlumnoInline(ci);
+    if(msg) { msg.textContent='✔ Alumno encontrado'; msg.style.color='#375623'; }
+  } else {
+    if(card) card.innerHTML='<span style="color:#C55A11">⚠ CI no encontrada en Alumnos Inclusivos</span>';
+    if(msg) { msg.textContent='CI no registrada'; msg.style.color='#C55A11'; }
+  }
+}
+
+// Migración: normaliza datos legacy de colecciones que guardaban texto en lugar de CI
+function migrarDatos() {
+  const alumnos = DB.get('alumnos');
+
+  // Migrar familias: campo "alumno" (texto) → "alumnoCI"
+  let familias = DB.get('familias');
+  let cambiosFam = 0;
+  familias = familias.map(f => {
+    if (f.alumnoCI) return f; // ya migrado
+    const nombre = (f.alumno||'').toLowerCase().trim();
+    if (!nombre) return {...f, alumnoCI:''};
+    const match = alumnos.find(a=>(a.apellidoNombre||'').toLowerCase().trim()===nombre);
+    if (match) { cambiosFam++; return {...f, alumnoCI:match.ci}; }
+    return {...f, alumnoCI:''};
+  });
+  if (cambiosFam > 0) DB.set('familias', familias);
+
+  // Limpiar redundancias en casos: quitar alumno/grado/ciclo del payload
+  // (ya no se guardan; se derivan de alumnos por ci)
+  let casos = DB.get('casos');
+  let cambiosCasos = 0;
+  casos = casos.map(c => {
+    if (!c.alumno && !c.grado && !c.ciclo) return c;
+    const clean = {...c};
+    delete clean.alumno; delete clean.grado; delete clean.ciclo;
+    cambiosCasos++;
+    return clean;
+  });
+  if (cambiosCasos > 0) DB.set('casos', casos);
+
+  // Limpiar seguimiento: quitar alumno/tipoAdecuacion del payload
+  let seguimiento = DB.get('seguimiento');
+  let cambiosSeg = 0;
+  seguimiento = seguimiento.map(s => {
+    if (!s.alumno && !s.tipoAdecuacion) return s;
+    const clean = {...s};
+    delete clean.alumno; delete clean.tipoAdecuacion;
+    cambiosSeg++;
+    return clean;
+  });
+  if (cambiosSeg > 0) DB.set('seguimiento', seguimiento);
+
+  if (cambiosFam+cambiosCasos+cambiosSeg > 0)
+    console.log(`Migración: ${cambiosFam} familias, ${cambiosCasos} casos, ${cambiosSeg} seguimientos normalizados.`);
+}
+
+// ════════════════════════════════════════════════
+// DATE & ALERT UTILS
+// ════════════════════════════════════════════════
+function daysLeft(s) {
+  if (!s) return null;
+  const t=new Date(); t.setHours(0,0,0,0);
+  const d=new Date(s); d.setHours(0,0,0,0);
+  return Math.round((d-t)/864e5);
+}
+
+function alertBadge(days) {
+  if (days===null) return '<span class="bd-nf">Sin fecha</span>';
+  if (days<0)   return `<span class="bd-vencido">🔴 VENCIDO (${Math.abs(days)}d)</span>`;
+  if (days<=15) return `<span class="bd-urgente">⚠️ ${days} días</span>`;
+  if (days<=30) return `<span class="bd-proximo">🟡 ${days} días</span>`;
+  return `<span class="bd-ok">🟢 ${days} días</span>`;
+}
+
+function rowCls(days) {
+  if (days===null) return '';
+  if (days<0)   return 'row-vencido';
+  if (days<=15) return 'row-urgente';
+  if (days<=30) return 'row-proximo';
+  return '';
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`;
+}
+
+function today() { return new Date().toISOString().slice(0,10); }
+
+function pctBar(val) {
+  const n = parseFloat(val)||0;
+  const col = n>=70?'#375623':n>=50?'#BF9000':'#C00000';
+  return `<div style="display:inline-flex;align-items:center;gap:5px">
+    <strong style="color:${col}">${n}%</strong>
+    <div class="pct-bar"><div class="pct-bar-fill" style="width:${n}%;background:${col}"></div></div>
+  </div>`;
+}
+
+function estadoBadge(est, map) {
+  const m = map || {Activo:'success',Egresado:'secondary',Trasladado:'warning text-dark',Retirado:'danger',
+    Pendiente:'warning text-dark',Cumplido:'success',Reprogramado:'info text-dark',Incumplido:'danger',
+    Completado:'success','En proceso':'info text-dark','En preparación':'info text-dark',
+    Presentado:'primary',Aprobado:'success',Observado:'danger'};
+  const cl = m[est] || 'secondary';
+  return `<span class="badge bg-${cl}">${est||'—'}</span>`;
+}
+
+// ════════════════════════════════════════════════
+// NAVEGACIÓN
+// ════════════════════════════════════════════════
+const renders = {dashboard:renderDashboard,casos:renderCasos,alumnos:renderAlumnos,familias:renderFamilias,documentos:renderDocumentos,seguimiento:renderSeguimiento,calendario:renderCalendario};
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#sidebar a.nav-link').forEach(l=>l.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('#sidebar a.nav-link').forEach(l=>{
+    if (l.getAttribute('onclick')?.includes("'"+name+"'")) l.classList.add('active');
+  });
+  if (renders[name]) renders[name]();
+}
+
+// Navega a una sección y aplica un filtro antes de renderizar
+function irAFiltro(page, filterId, valor, renderFn) {
+  showPage(page);
+  // Pequeño delay para que el DOM de la página destino esté activo
+  setTimeout(() => {
+    const el = document.getElementById(filterId);
+    if (el) el.value = valor;
+    renderFn();
+  }, 30);
+}
+
+// Para la tarjeta de alertas: queda en dashboard y hace scroll + destaca la tabla
+function verAlertas() {
+  const el = document.getElementById('alert-table');
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Quitar clase previa y re-agregar para reiniciar la animación
+  el.classList.remove('flash-alert');
+  void el.offsetWidth; // reflow
+  el.classList.add('flash-alert');
+  el.addEventListener('animationend', () => el.classList.remove('flash-alert'), { once: true });
+}
+
+// ════════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════════
+let _bsModal;
+function getModal() { if(!_bsModal) _bsModal=new bootstrap.Modal(document.getElementById('mainModal')); return _bsModal; }
+function openModal(title, html, onSave) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalSave').onclick = onSave;
+  getModal().show();
+}
+function closeModal() { getModal().hide(); }
+function fld(id) { return (document.getElementById(id)?.value||'').trim(); }
+
+// ════════════════════════════════════════════════
+// MÓDULO CASOS ANEAE — Ajustes Razonables (9 Pasos)
+// Base: Orientaciones Técnicas MEC marzo 2025
+// ════════════════════════════════════════════════
+
+// Feriados nacionales 2026 (Res. MEC 2065/2025 Anexo II + institucionales)
+const FERIADOS_2026 = [
+  '2026-03-01','2026-04-02','2026-04-03','2026-04-30',
+  '2026-05-01','2026-05-14','2026-05-15','2026-06-12',
+  '2026-06-20','2026-08-15','2026-09-29','2026-12-08',
+  '2026-02-09', // Reunión de Padres (no hay clases, inst.)
+  '2026-05-08', // Entrevistas padres (no hay clases, inst.)
+  '2026-09-01', // Entrevistas padres (no hay clases, inst.)
+  '2026-07-13','2026-07-14','2026-07-15','2026-07-16','2026-07-17', // Vacaciones invierno
+  '2026-07-20','2026-07-21','2026-07-22','2026-07-23','2026-07-24',
+];
+
+// Plazos por paso en días hábiles (Orientaciones Técnicas MEC)
+const PLAZOS_PASOS = {1:30, 2:15, 3:7, 4:7, 7:20};
+
+// Definición de los 9 pasos
+const DEF_PASOS = [
+  {num:1, nombre:'Identificación',           instr_nosig:'Instrumento I',                    instr_sig:'Instrumento I'},
+  {num:2, nombre:'Diseño del Ajuste',        instr_nosig:'Instrumento II',                   instr_sig:'Instrumento II + III'},
+  {num:3, nombre:'Validación Dirección',     instr_nosig:'Instrumento III (validado)',        instr_sig:'Instrumento III (validado)'},
+  {num:4, nombre:'Acuerdo con Familia',      instr_nosig:'Instrumento IV',                   instr_sig:'Instrumento IV'},
+  {num:5, nombre:'Implementación',           instr_nosig:'Portafolio / Registros de aula',   instr_sig:'Portafolio / Registros de aula'},
+  {num:6, nombre:'Presentación Supervisión', instr_nosig:'Lista de casos (resumen)',          instr_sig:'Legajo completo I–IV'},
+  {num:7, nombre:'Aprobación Supervisión',   instr_nosig:'(No aplica)',                       instr_sig:'Instrumento V — Informe Técnico'},
+  {num:8, nombre:'Evaluación',               instr_nosig:'Boletín + registro descriptivo',   instr_sig:'Boletín + Informe descriptivo (obligatorio)'},
+  {num:9, nombre:'Promoción / Traslado',     instr_nosig:'Instrumento VIII o IX',             instr_sig:'Instrumento VIII o IX'},
+];
+
+const ESTADOS_ORDEN = [
+  'Identificado','Diseñado','Validado','Acordado','En Implementación',
+  'Presentado a Supervisión','Aprobado','Evaluado','Promovido','En Mediación',
+];
+
+const ESTADO_COLOR = {
+  'Identificado':'secondary','Diseñado':'info text-dark','Validado':'primary',
+  'Acordado':'warning text-dark','En Implementación':'success',
+  'Presentado a Supervisión':'primary','Aprobado':'success',
+  'Evaluado':'info text-dark','Promovido':'success','En Mediación':'danger',
+};
+
+// ── Días hábiles ──────────────────────────────────────────
+function esDiaHabil(fechaIso) {
+  const d = new Date(fechaIso); const dow = d.getDay();
+  return dow!==0 && dow!==6 && !FERIADOS_2026.includes(fechaIso);
+}
+
+function sumarDiasHabiles(fechaIso, dias) {
+  if (!fechaIso || !dias) return '';
+  let d = new Date(fechaIso); let c = 0;
+  while (c < dias) {
+    d.setDate(d.getDate()+1);
+    if (esDiaHabil(d.toISOString().slice(0,10))) c++;
+  }
+  return d.toISOString().slice(0,10);
+}
+
+function diasHabilesRestantes(fechaLimIso) {
+  if (!fechaLimIso) return null;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const lim = new Date(fechaLimIso); lim.setHours(0,0,0,0);
+  let count = 0; const sign = lim >= hoy ? 1 : -1;
+  let d = sign>0 ? new Date(hoy) : new Date(lim);
+  const fin = sign>0 ? lim : hoy;
+  while (d < fin) {
+    d.setDate(d.getDate()+1);
+    if (esDiaHabil(d.toISOString().slice(0,10))) count++;
+  }
+  return sign * count;
+}
+
+function semaforo(diasHab, pasoNum) {
+  if (diasHab===null) return 'gris';
+  if (diasHab < 0) return 'rojo';
+  const umbral = pasoNum <= 4 ? 5 : 7; // configurable
+  if (diasHab <= umbral) return 'amarillo';
+  return 'verde';
+}
+
+function badgeSemaf(nivel) {
+  const map = {
+    verde:'<span class="semaf-verde">🟢 En plazo</span>',
+    amarillo:'<span class="semaf-amarillo">⚠️ Por vencer</span>',
+    rojo:'<span class="semaf-rojo">🔴 Vencido</span>',
+    gris:'<span class="semaf-gris">Sin plazo</span>',
+  };
+  return map[nivel]||map.gris;
+}
+
+// ── Constructor de pasos para un caso nuevo ───────────────
+function generarPasos(tipo, fechaApertura) {
+  return DEF_PASOS.map((def, i) => {
+    const plazo = PLAZOS_PASOS[def.num] || null;
+    let fechaLimite = '';
+    // Paso 1: plazo desde apertura del año
+    if (def.num===1 && fechaApertura) fechaLimite = sumarDiasHabiles(fechaApertura, plazo);
+    return {
+      num: def.num,
+      nombre: def.nombre,
+      instrObligatorio: tipo==='Significativo' ? def.instr_sig : def.instr_nosig,
+      plazoHabiles: plazo,
+      fechaInicioConteo: def.num===1 ? fechaApertura : '',
+      fechaLimite,
+      estado: 'Pendiente',   // Pendiente | En proceso | Completado
+      fechaCumplimiento: '',
+      instrumentoCargado: false,
+      observaciones: '',
+    };
+  });
+}
+
+// Recalcula fechas límite encadenadas cuando se completa un paso
+function recalcFechas(caso) {
+  const pasos = caso.pasos;
+  for (let i=1; i<pasos.length; i++) {
+    const p = pasos[i]; const prev = pasos[i-1];
+    if (!PLAZOS_PASOS[p.num]) continue;
+    const inicio = prev.fechaCumplimiento || '';
+    if (inicio) p.fechaLimite = sumarDiasHabiles(inicio, p.plazoHabiles);
+    p.fechaInicioConteo = inicio;
+  }
+}
+
+// Nivel de alerta general del caso (peor semáforo de sus pasos activos)
+function alertaCaso(caso) {
+  let nivel = 'gris';
+  for (const p of caso.pasos) {
+    if (p.estado==='Completado') continue;
+    if (!p.fechaLimite) continue;
+    const dias = diasHabilesRestantes(p.fechaLimite);
+    const s = semaforo(dias, p.num);
+    if (s==='rojo') return 'rojo';
+    if (s==='amarillo') nivel = 'amarillo';
+    else if (s==='verde' && nivel==='gris') nivel = 'verde';
+  }
+  return nivel;
+}
+
+// ── RENDER CASOS ─────────────────────────────────────────
+function renderCasos() {
+  const q    = (document.getElementById('q-casos')?.value||'').toLowerCase();
+  const tipo = document.getElementById('f-tipo-caso')?.value||'';
+  const est  = document.getElementById('f-estado-caso')?.value||'';
+  const ciclo= document.getElementById('f-ciclo-caso')?.value||'';
+
+  // Enriquecer casos con datos actuales del alumno (fuente de verdad: alumnos)
+  const data = DB.get('casos').map(c=>{
+    const a = getAlumnoByCi(c.ci);
+    return {...c,
+      _nombre: a?.apellidoNombre || '—',
+      _grado:  a?.curso || '—',
+      _ciclo:  a?.ciclo || a?.turno || '—',
+      _tel:    a?.telFamilia || '—',
+      _alerta: alertaCaso(c),
+    };
+  }).filter(c=>
+    (!q     || c._nombre.toLowerCase().includes(q)) &&
+    (!tipo  || c.tipo===tipo) &&
+    (!est   || c.estado===est) &&
+    (!ciclo || c._ciclo===ciclo)
+  );
+
+  document.getElementById('cnt-casos').textContent = data.length + ' casos';
+
+  if (!data.length) {
+    document.getElementById('table-casos').innerHTML =
+      `<div class="empty-state"><i class="bi bi-diagram-3"></i>No hay casos ANEAE registrados.<br><small>Usá "Nuevo Caso" para registrar el primer expediente.</small></div>`;
+    return;
+  }
+
+  document.getElementById('table-casos').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Alumno</th><th>CI</th><th>Grado</th><th>Ciclo</th>
+        <th>Tipo</th><th>Estado actual</th><th>Paso activo</th>
+        <th>Fecha límite paso</th><th>Días háb. rest.</th><th>Alerta</th>
+        <th>Docente</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((c,i)=>{
+        // Paso activo = primer paso no completado
+        const pasoActivo = c.pasos?.find(p=>p.estado!=='Completado') || c.pasos?.[c.pasos.length-1];
+        const dias = pasoActivo?.fechaLimite ? diasHabilesRestantes(pasoActivo.fechaLimite) : null;
+        const nivel = semaforo(dias, pasoActivo?.num||1);
+        return `<tr class="${c._alerta==='rojo'?'row-vencido':c._alerta==='amarillo'?'row-urgente':''}">
+          <td style="color:#888">${i+1}</td>
+          <td><strong>${c._nombre}</strong></td>
+          <td><small style="font-family:monospace">${c.ci||'—'}</small></td>
+          <td>${c._grado}</td><td><small>${c._ciclo}</small></td>
+          <td>${c.tipo==='Significativo'?'<span class="tipo-badge-sig">Significativo</span>':'<span class="tipo-badge-nosig">No Significativo</span>'}</td>
+          <td><span class="badge bg-${ESTADO_COLOR[c.estado]||'secondary'}">${c.estado||'—'}</span></td>
+          <td><small>${pasoActivo?`Paso ${pasoActivo.num}: ${pasoActivo.nombre}`:'—'}</small></td>
+          <td style="white-space:nowrap">${fmtDate(pasoActivo?.fechaLimite)}</td>
+          <td style="text-align:center">${dias!==null?`<strong>${dias}</strong>`:'—'}</td>
+          <td>${badgeSemaf(nivel)}</td>
+          <td><small>${c.docente||'—'}</small></td>
+          <td class="text-nowrap">
+            <button class="btn-edit me-1" onclick="detalleCaso('${c.id}')" title="Ver expediente completo"><i class="bi bi-folder2-open"></i></button>
+            <button class="btn-edit me-1" onclick="modalCaso('${c.id}')" title="Editar datos"><i class="bi bi-pencil-fill"></i></button>
+            <button class="btn-del" onclick="delItem('casos','${c.id}',renderCasos)"><i class="bi bi-trash-fill"></i></button>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+}
+
+// ── MODAL NUEVO/EDITAR CASO ───────────────────────────────
+function modalCaso(id) {
+  const c = id ? DB.byId('casos',id) : {};
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Caso ANEAE':'Nuevo Caso — Ajuste Razonable', `
+  <div class="row g-2">
+    ${selectorAlumnoHTML('caso', c.ci||'')}
+    <div class="col-md-4"><label class="form-label">Año lectivo</label>
+      <input class="form-control" id="c_anio" value="${c.anioLectivo||'2026'}"></div>
+    <div class="col-12"><label class="form-label">Tipo de Ajuste *</label>
+      <div class="d-flex gap-3 mt-1">
+        <label style="font-size:13px;cursor:pointer"><input type="radio" name="c_tipo" value="No Significativo" ${(!c.tipo||c.tipo==='No Significativo')?'checked':''}> No Significativo — Instr. I y II</label>
+        <label style="font-size:13px;cursor:pointer"><input type="radio" name="c_tipo" value="Significativo" ${c.tipo==='Significativo'?'checked':''}> Significativo — Instr. I, II, III + Informe Técnico Supervisión</label>
+      </div></div>
+    <div class="col-md-6"><label class="form-label">Estado actual</label>
+      <select class="form-select" id="c_estado">
+        ${opts(ESTADOS_ORDEN, c.estado||'Identificado')}</select></div>
+    <div class="col-md-6"><label class="form-label">Fecha de apertura del caso</label>
+      <input class="form-control" type="date" id="c_apertura" value="${c.fechaApertura||'2026-02-23'}"></div>
+    <div class="col-12"><label class="form-label">Docente Responsable</label>
+      <input class="form-control" id="c_docente" value="${c.docente||''}"></div>
+    <div class="col-12"><label class="form-label">Observaciones generales del caso</label>
+      <textarea class="form-control" id="c_obs" rows="2">${c.observaciones||''}</textarea></div>
+  </div>
+  <div class="norm-box mt-3" style="font-size:10px">
+    <strong>Regla crítica (MEC):</strong> El Paso 5 (Implementación) inicia tras el Acuerdo familiar y NO espera la aprobación de Supervisión. Los plazos se calculan en días hábiles según Res. MEC 2065/2025.
+  </div>`, ()=>{
+    const ci = fld('caso_ci');
+    const alumnoObj = getAlumnoByCi(ci);
+    if (!ci)        { alert('La CI del alumno es requerida.'); return; }
+    if (!alumnoObj) { alert('CI no encontrada en Alumnos Inclusivos. Registrá el alumno primero.'); return; }
+    const tipo = document.querySelector('input[name="c_tipo"]:checked')?.value||'No Significativo';
+    const apertura = fld('c_apertura');
+    let pasos = c.pasos || generarPasos(tipo, apertura);
+    if (!id || c.tipo!==tipo) {
+      pasos = pasos.map((p,i)=>({...p, instrObligatorio: tipo==='Significativo'?DEF_PASOS[i].instr_sig:DEF_PASOS[i].instr_nosig}));
+    }
+    // Solo guardar ci y datos propios del caso — nombre/grado/ciclo se derivan de alumnos
+    saveItem('casos', id, {
+      ci, anioLectivo:fld('c_anio'),
+      tipo, estado:fld('c_estado')||'Identificado', fechaApertura:apertura,
+      docente:fld('c_docente'), observaciones:fld('c_obs'), pasos,
+    });
+    closeModal(); renderCasos();
+  });
+}
+
+// autoFillCaso eliminada — reemplazada por fillAlumno() genérica
+
+// ── DETALLE DEL CASO (ficha completa con 9 pasos) ─────────
+function detalleCaso(id) {
+  const c = DB.byId('casos', id); if (!c) return;
+  const tipo = c.tipo||'No Significativo';
+  const aObj = getAlumnoByCi(c.ci); // fuente de verdad para datos del alumno
+  const _nombre = aObj?.apellidoNombre || '—';
+  const _grado  = aObj?.curso || '—';
+  const _ciclo  = aObj?.ciclo || aObj?.turno || '—';
+  const _tel    = aObj?.telFamilia || '—';
+  const _adec   = aObj?.tipoAdecuacion || c.tipo || '—';
+
+  const timelineHTML = (c.pasos||[]).map(p=>{
+    const cls = p.estado==='Completado'?'paso-completado':p.estado==='En proceso'?'paso-proceso':'paso-pendiente';
+    const dias = p.fechaLimite ? diasHabilesRestantes(p.fechaLimite) : null;
+    const s = semaforo(dias, p.num);
+    const extra = tipo==='No Significativo'&&p.num===7 ? ' style="opacity:.4" title="Solo significativos"' : '';
+    return `<div class="paso-item ${cls}"${extra}>
+      <div class="paso-circle">${p.num}</div>
+      <div class="paso-label">${p.nombre}</div>
+      ${p.fechaLimite&&p.estado!=='Completado'?`<div style="margin-top:3px">${badgeSemaf(s)}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const pasosHTML = (c.pasos||[]).map(p=>{
+    const esNA = tipo==='No Significativo' && p.num===7;
+    const dias  = p.fechaLimite ? diasHabilesRestantes(p.fechaLimite) : null;
+    const nivel = semaforo(dias, p.num);
+    const estadoCls = p.estado==='Completado'?'bg-success':p.estado==='En proceso'?'bg-primary':'bg-secondary';
+    return `
+    <div class="table-card p-3 mb-2${esNA?' opacity-50':''}">
+      <div class="d-flex align-items-start gap-3 flex-wrap">
+        <div style="background:var(--azul-osc);color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${p.num}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px;color:var(--azul-osc)">${p.nombre} ${esNA?'<small style="color:#999">(no aplica — caso no significativo)</small>':''}</div>
+          <div style="font-size:11px;color:#666;margin-top:2px">Instrumento obligatorio: <strong>${p.instrObligatorio}</strong></div>
+          ${p.plazoHabiles?`<div style="font-size:11px;color:#888">Plazo: ${p.plazoHabiles} días hábiles desde inicio conteo</div>`:''}
+        </div>
+        <div class="text-end" style="flex-shrink:0">
+          <span class="badge ${estadoCls}">${p.estado}</span><br>
+          ${p.fechaLimite?`<small style="color:#666">Límite: ${fmtDate(p.fechaLimite)}</small><br>`:''}
+          ${dias!==null&&p.estado!=='Completado'?badgeSemaf(nivel):''}
+          ${p.fechaCumplimiento?`<small style="color:#375623">✔ Cumplido: ${fmtDate(p.fechaCumplimiento)}</small>`:''}
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <label style="font-size:12px;cursor:pointer">
+          <input type="checkbox" ${p.instrumentoCargado?'checked':''} onchange="toggleInstrumento('${id}',${p.num-1},this.checked)" style="width:15px;height:15px;accent-color:#375623;margin-right:4px">
+          Instrumento / evidencia cargada
+        </label>
+        <select onchange="cambiarEstadoPaso('${id}',${p.num-1},this.value)" class="form-select form-select-sm" style="width:160px">
+          ${['Pendiente','En proceso','Completado'].map(e=>`<option${p.estado===e?' selected':''}>${e}</option>`).join('')}
+        </select>
+        ${p.estado==='Completado'&&!p.fechaCumplimiento?
+          `<input type="date" class="form-control form-control-sm" style="width:150px" placeholder="Fecha de cumplimiento"
+           onchange="setFechaCumplimiento('${id}',${p.num-1},this.value)" value="${p.fechaCumplimiento||today()}">`:''}
+      </div>
+      ${p.observaciones?`<div style="margin-top:6px;font-size:11px;color:#555;background:#f8f9fa;padding:6px;border-radius:4px">${p.observaciones}</div>`:''}
+      <div style="margin-top:6px">
+        <input type="text" class="form-control form-control-sm" placeholder="Observaciones del paso..."
+          value="${p.observaciones||''}" style="font-size:11px"
+          onchange="setObsPaso('${id}',${p.num-1},this.value)">
+      </div>
+    </div>`;
+  }).join('');
+
+  openModal(`📋 Expediente: ${c.alumno} — Caso ${tipo}`,`
+    <div class="norm-box mb-3" style="font-size:11px">
+      <div style="margin-bottom:4px">
+        <strong style="font-size:13px;color:#1F3864">${_nombre}</strong>
+        <span class="${c.tipo==='Significativo'?'tipo-badge-sig':'tipo-badge-nosig'}" style="margin-left:8px">${c.tipo}</span>
+      </div>
+      <strong>CI:</strong> ${c.ci} &nbsp;|&nbsp;
+      <strong>Grado:</strong> ${_grado} &nbsp;|&nbsp;
+      <strong>Ciclo:</strong> ${_ciclo} &nbsp;|&nbsp;
+      <strong>Adecuación:</strong> ${_adec.replace('Adecuación ','')} &nbsp;|&nbsp;
+      <strong>Tel. familia:</strong> ${_tel}<br>
+      <strong>Año:</strong> ${c.anioLectivo} &nbsp;|&nbsp;
+      <strong>Docente:</strong> ${c.docente||'—'} &nbsp;|&nbsp;
+      <strong>Apertura:</strong> ${fmtDate(c.fechaApertura)}
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;color:#888;margin-bottom:6px">Línea de tiempo — Proceso de 9 pasos</div>
+      <div class="paso-timeline">${timelineHTML}</div>
+    </div>
+    <div id="pasos-detalle">${pasosHTML}</div>
+  `, ()=>{ closeModal(); renderCasos(); });
+  // Cambiar botón guardar
+  document.getElementById('modalSave').innerHTML = '<i class="bi bi-check-lg"></i> Cerrar y actualizar';
+  document.getElementById('modalSave').onclick = ()=>{ closeModal(); renderCasos(); };
+}
+
+function toggleInstrumento(casoId, pasoIdx, val) {
+  const c = DB.byId('casos', casoId); if (!c) return;
+  c.pasos[pasoIdx].instrumentoCargado = val;
+  DB.update('casos', casoId, c); // no cierra modal
+}
+
+function cambiarEstadoPaso(casoId, pasoIdx, nuevoEstado) {
+  const c = DB.byId('casos', casoId); if (!c) return;
+  c.pasos[pasoIdx].estado = nuevoEstado;
+  if (nuevoEstado==='Completado' && !c.pasos[pasoIdx].fechaCumplimiento) {
+    c.pasos[pasoIdx].fechaCumplimiento = today();
+    recalcFechas(c);
+  }
+  // Actualizar estado general del caso al paso completado más avanzado
+  const completados = c.pasos.filter(p=>p.estado==='Completado');
+  if (completados.length > 0) {
+    const maxPaso = completados[completados.length-1].num;
+    const estadoMap = {1:'Identificado',2:'Diseñado',3:'Validado',4:'Acordado',5:'En Implementación',
+      6:'Presentado a Supervisión',7:'Aprobado',8:'Evaluado',9:'Promovido'};
+    if (estadoMap[maxPaso]) c.estado = estadoMap[maxPaso];
+  }
+  DB.update('casos', casoId, c);
+  // Refrescar el detalle sin cerrar modal
+  const el = document.getElementById('pasos-detalle');
+  if (el) detalleCaso(casoId); // re-abrir actualizado
+}
+
+function setFechaCumplimiento(casoId, pasoIdx, fecha) {
+  const c = DB.byId('casos', casoId); if (!c) return;
+  c.pasos[pasoIdx].fechaCumplimiento = fecha;
+  recalcFechas(c);
+  DB.update('casos', casoId, c);
+}
+
+function setObsPaso(casoId, pasoIdx, obs) {
+  const c = DB.byId('casos', casoId); if (!c) return;
+  c.pasos[pasoIdx].observaciones = obs;
+  DB.update('casos', casoId, c);
+}
+
+// ════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════
+function renderDashboard() {
+  document.getElementById('dash-fecha').textContent = new Date().toLocaleDateString('es-PY',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  const casos     = DB.get('casos');
+  const alumnos   = DB.get('alumnos');
+  const familias  = DB.get('familias');
+  const docs      = DB.get('documentos');
+  const cal       = DB.get('calendario');
+
+  // ── KPIs ANEAE ───────────────────────────────────────────
+  const totalANEAE  = casos.length;
+  const casosProc   = casos.filter(c=>c.estado!=='Promovido'&&c.estado!=='Evaluado').length;
+  const casosRojo   = casos.filter(c=>alertaCaso(c)==='rojo').length;
+  const sig         = casos.filter(c=>c.tipo==='Significativo').length;
+  const nosig       = casos.filter(c=>c.tipo==='No Significativo').length;
+  // % cumplimiento = pasos completados / total pasos activos
+  const totalPasos = casos.reduce((s,c)=>(c.pasos||[]).reduce((a,p)=>a+(p.estado!=='Pendiente'?1:0),s),0);
+  const totalPosible = casos.reduce((s,c)=>(c.pasos||[]).length+s,0);
+  const pctCumpl = totalPosible>0 ? Math.round(totalPasos/totalPosible*100) : 0;
+
+  // KPIs legacy
+  const totalAlu  = alumnos.filter(a=>a.estado==='Activo'||!a.estado).length;
+  const docsPend  = docs.filter(d=>d.estado==='Pendiente'||d.estado==='En preparación').length;
+
+  const allItems = [
+    ...familias.filter(f=>f.fechaLimite).map(f=>({tipo:'🤝 Familia',desc:(f.acuerdo||'—').slice(0,65),alumno:f.alumno||'—',fecha:f.fechaLimite,estado:f.estado,resp:f.responsable||'—'})),
+    ...docs.filter(d=>d.fechaLimite).map(d=>({tipo:'📄 MEC',desc:(d.documento||'—').slice(0,65),alumno:d.alumnos||'Todos',fecha:d.fechaLimite,estado:d.estado,resp:d.responsable||'—'})),
+    ...cal.filter(c=>c.fecha).map(c=>({tipo:'📅 Calendario',desc:(c.accion||'—').slice(0,65),alumno:c.destinatario||'—',fecha:c.fecha,estado:c.estado,resp:'—'})),
+  ].map(x=>({...x,days:daysLeft(x.fecha)})).filter(x=>x.days!==null&&x.days<=30).sort((a,b)=>a.days-b.days);
+
+  // ── Fila 1: KPIs Gerenciales ANEAE ───────────────────────
+  const kpis = [
+    {n:totalANEAE, l:'ANEAE activos',         c:'#2E75B6', ic:'bi-diagram-3-fill',           fn:`showPage('casos')`},
+    {n:casosProc,  l:'Casos en proceso',        c:'#C55A11', ic:'bi-arrow-repeat',              fn:`irAFiltro('casos','f-estado-caso','',renderCasos)`},
+    {n:casosRojo,  l:'Alertas rojas (pasos)',   c:'#C00000', ic:'bi-exclamation-triangle-fill', fn:`showPage('casos')`},
+    {n:pctCumpl+'%',l:'Cumplimiento de pasos', c:pctCumpl>=70?'#375623':pctCumpl>=40?'#BF9000':'#C00000', ic:'bi-check2-all', fn:`showPage('casos')`},
+  ];
+  document.getElementById('stats-row').innerHTML = kpis.map(s=>`
+    <div class="col-6 col-xl-3" onclick="${s.fn}" style="cursor:pointer">
+      <div class="stat-card" style="border-left-color:${s.c}">
+        <div class="d-flex align-items-center gap-3">
+          <i class="bi ${s.ic}" style="color:${s.c};font-size:1.8rem;opacity:.65"></i>
+          <div style="flex:1">
+            <div class="num" style="color:${s.c}">${s.n}</div>
+            <div class="lbl">${s.l}</div>
+            <div class="hint"><i class="bi bi-arrow-right-circle me-1"></i>Ver detalle →</div>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // ── Fila 2: Embudo de 9 pasos + Tipo de caso ─────────────
+  const ESTADOS_EMBUDO = ['Identificado','Diseñado','Validado','Acordado','En Implementación','Presentado a Supervisión','Aprobado','Evaluado','Promovido'];
+  const maxE = Math.max(1, ...ESTADOS_EMBUDO.map(e=>casos.filter(c=>c.estado===e).length));
+  const funnelHTML = ESTADOS_EMBUDO.map((e,i)=>{
+    const cnt = casos.filter(c=>c.estado===e).length;
+    const w = Math.round(cnt/maxE*100)||0;
+    return `<div class="funnel-row" onclick="irAFiltro('casos','f-estado-caso','${e}',renderCasos)" style="cursor:pointer">
+      <div class="funnel-label">${i+1}. ${e}</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${w}%"></div></div>
+      <div class="funnel-count">${cnt}</div>
+    </div>`;
+  }).join('');
+
+  const pieTotal = sig+nosig||1;
+  const sigPct = Math.round(sig/pieTotal*100);
+  const pieSVG = `<svg viewBox="0 0 80 80" style="width:80px;height:80px;transform:rotate(-90deg)">
+    <circle r="30" cx="40" cy="40" fill="none" stroke="#DEEAF1" stroke-width="18"/>
+    <circle r="30" cx="40" cy="40" fill="none" stroke="#C00000" stroke-width="18"
+      stroke-dasharray="${sigPct*1.885} ${(100-sigPct)*1.885}" stroke-linecap="butt"/>
+  </svg>`;
+
+  // Inject panel gerencial entre stats-row y alert-table
+  let gerDiv = document.getElementById('panel-gerencial');
+  if (!gerDiv) {
+    gerDiv = document.createElement('div');
+    gerDiv.id = 'panel-gerencial';
+    const statsRow = document.getElementById('stats-row');
+    statsRow.parentNode.insertBefore(gerDiv, statsRow.nextSibling);
+  }
+  gerDiv.innerHTML = `
+  <div class="row g-3 mb-3 mt-0">
+    <div class="col-lg-7">
+      <div class="table-card p-3">
+        <h6 style="color:var(--azul-osc);font-weight:700;border-bottom:2px solid var(--azul-med);padding-bottom:5px;margin-bottom:10px;font-size:12px">
+          <i class="bi bi-funnel-fill me-2"></i>Embudo de los 9 Pasos — Casos por etapa
+        </h6>
+        ${casos.length ? funnelHTML : '<div class="text-center text-muted py-2" style="font-size:12px">Sin casos registrados aún</div>'}
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="table-card p-3 h-100">
+        <h6 style="color:var(--azul-osc);font-weight:700;border-bottom:2px solid var(--azul-med);padding-bottom:5px;margin-bottom:10px;font-size:12px">
+          <i class="bi bi-pie-chart-fill me-2"></i>Significativos vs No Significativos
+        </h6>
+        <div class="d-flex align-items-center gap-3">
+          <div style="position:relative">${pieSVG}
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:700;color:var(--azul-osc)">${totalANEAE}</div>
+          </div>
+          <div>
+            <div style="font-size:12px;margin-bottom:6px"><span style="display:inline-block;width:12px;height:12px;background:#C00000;border-radius:2px;margin-right:6px"></span><strong>${sig}</strong> Significativos (${sigPct}%)</div>
+            <div style="font-size:12px"><span style="display:inline-block;width:12px;height:12px;background:#DEEAF1;border:1px solid #2E75B6;border-radius:2px;margin-right:6px"></span><strong>${nosig}</strong> No Significativos (${100-sigPct}%)</div>
+          </div>
+        </div>
+        <div class="mt-3" style="font-size:11px;color:#666">
+          <div><strong>Docs. MEC pendientes:</strong> ${docsPend} &nbsp;|&nbsp; <strong>Alumnos activos:</strong> ${totalAlu}</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  if (!allItems.length) {
+    document.getElementById('alert-table').innerHTML = `
+      <div class="empty-state"><i class="bi bi-check-circle-fill text-success"></i>
+        No hay vencimientos en los próximos 30 días.<br><small>El sistema revisará automáticamente al reabrir.</small></div>`;
+    return;
+  }
+
+  document.getElementById('alert-table').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm" style="font-size:12px">
+      <thead><tr><th>Tipo</th><th>Descripción</th><th>Alumno / Dest.</th><th>Fecha Límite</th><th>Alerta</th><th>Estado</th><th>Responsable</th></tr></thead>
+      <tbody>${allItems.map(x=>`<tr class="${rowCls(x.days)}">
+        <td style="white-space:nowrap">${x.tipo}</td>
+        <td>${x.desc}</td>
+        <td>${x.alumno}</td>
+        <td style="white-space:nowrap">${fmtDate(x.fecha)}</td>
+        <td>${alertBadge(x.days)}</td>
+        <td>${estadoBadge(x.estado)}</td>
+        <td>${x.resp}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+// ════════════════════════════════════════════════
+// ALUMNOS
+// ════════════════════════════════════════════════
+function renderAlumnos() {
+  const q   = (document.getElementById('q-alumnos')?.value||'').toLowerCase();
+  const est = document.getElementById('f-estado-alu')?.value||'';
+  const tur = document.getElementById('f-turno-alu')?.value||'';
+  const data = DB.get('alumnos').filter(a=>
+    (!q   || (a.apellidoNombre||'').toLowerCase().includes(q)) &&
+    (!est || a.estado===est) &&
+    (!tur || a.turno===tur)
+  );
+  document.getElementById('cnt-alumnos').textContent = data.length + ' alumnos';
+
+  if (!data.length) {
+    document.getElementById('table-alumnos').innerHTML = `<div class="empty-state"><i class="bi bi-people"></i>No hay alumnos registrados.<br><small>Usá el botón "Agregar Alumno" para comenzar.</small></div>`;
+    return;
+  }
+
+  document.getElementById('table-alumnos').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Apellido y Nombre</th><th>CI</th><th>F. Nacim.</th>
+        <th>Curso</th><th>Turno</th><th>Necesidad / Diagnóstico</th>
+        <th>Tipo Adecuación</th><th>Apoyo</th><th>F. Ingreso</th>
+        <th>Docente Resp.</th><th>Tel. Familia</th><th>Estado</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((a,i)=>`<tr>
+        <td style="color:#888">${i+1}</td>
+        <td><strong>${a.apellidoNombre||'—'}</strong></td>
+        <td>${a.ci||'—'}</td>
+        <td>${fmtDate(a.fechaNacim)}</td>
+        <td>${a.curso||'—'}</td>
+        <td>${a.turno||'—'}</td>
+        <td>${(a.necesidad||'—').slice(0,45)}</td>
+        <td><small>${(a.tipoAdecuacion||'—').replace('Adecuación ','Adec. ')}</small></td>
+        <td><small>${a.gradoApoyo||'—'}</small></td>
+        <td>${fmtDate(a.fechaIngreso)}</td>
+        <td><small>${a.docente||'—'}</small></td>
+        <td>${a.telFamilia||'—'}</td>
+        <td>${estadoBadge(a.estado||'Activo')}</td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalAlumno('${a.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('alumnos','${a.id}',renderAlumnos)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+function modalAlumno(id) {
+  const a = id ? DB.byId('alumnos',id) : {};
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Alumno':'Agregar Alumno Inclusivo', `
+  <div class="row g-2">
+    <div class="col-md-8"><label class="form-label">Apellido y Nombre *</label>
+      <input class="form-control" id="f_nom" value="${a.apellidoNombre||''}"></div>
+    <div class="col-md-4"><label class="form-label">CI / Documento</label>
+      <input class="form-control" id="f_ci" value="${a.ci||''}"></div>
+    <div class="col-md-4"><label class="form-label">Fecha de Nacimiento</label>
+      <input class="form-control" type="date" id="f_fnac" value="${a.fechaNacim||''}"></div>
+    <div class="col-md-4"><label class="form-label">Curso / Grado</label>
+      <input class="form-control" id="f_curso" value="${a.curso||''}" placeholder="Ej: 1° Año, 3° Grado"></div>
+    <div class="col-md-4"><label class="form-label">Turno</label>
+      <select class="form-select" id="f_turno"><option value=""></option>
+        ${opts(['Mañana','Tarde','Tiempo Completo'],a.turno)}</select></div>
+    <div class="col-12"><label class="form-label">Necesidad / Diagnóstico</label>
+      <input class="form-control" id="f_nec" value="${a.necesidad||''}" placeholder="Ej: Discapacidad intelectual leve, TEA, hipoacusia..."></div>
+    <div class="col-md-7"><label class="form-label">Tipo de Adecuación</label>
+      <select class="form-select" id="f_adec"><option value=""></option>
+        ${opts(['Adecuación de Acceso','Adecuación Curricular No Significativa','Adecuación Curricular Significativa'],a.tipoAdecuacion)}</select></div>
+    <div class="col-md-5"><label class="form-label">Grado de Apoyo</label>
+      <select class="form-select" id="f_apoyo"><option value=""></option>
+        ${opts(['Leve','Moderado','Intenso'],a.gradoApoyo)}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha de Ingreso</label>
+      <input class="form-control" type="date" id="f_fing" value="${a.fechaIngreso||''}"></div>
+    <div class="col-md-8"><label class="form-label">Docente Responsable</label>
+      <input class="form-control" id="f_doc" value="${a.docente||''}"></div>
+    <div class="col-md-4"><label class="form-label">Teléfono Familia</label>
+      <input class="form-control" id="f_tel" value="${a.telFamilia||''}"></div>
+    <div class="col-md-5"><label class="form-label">Responsable MEC</label>
+      <input class="form-control" id="f_rmec" value="${a.responsableMEC||'Lic. Rodrigo Godoy'}"></div>
+    <div class="col-md-3"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Activo','Egresado','Trasladado','Retirado'],a.estado||'Activo')}</select></div>
+    <div class="col-12"><label class="form-label">Observaciones</label>
+      <textarea class="form-control" id="f_obs" rows="2">${a.observaciones||''}</textarea></div>
+  </div>`, ()=>{
+    const nombre=fld('f_nom'); if(!nombre){alert('El nombre es requerido.');return;}
+    DB[id?'update':'add']('alumnos', ...(id?[id]:[]), {
+      apellidoNombre:nombre,ci:fld('f_ci'),fechaNacim:fld('f_fnac'),curso:fld('f_curso'),
+      turno:fld('f_turno'),necesidad:fld('f_nec'),tipoAdecuacion:fld('f_adec'),
+      gradoApoyo:fld('f_apoyo'),fechaIngreso:fld('f_fing'),docente:fld('f_doc'),
+      telFamilia:fld('f_tel'),responsableMEC:fld('f_rmec'),estado:fld('f_est')||'Activo',
+      observaciones:fld('f_obs'),
+    });
+    closeModal(); renderAlumnos();
+  });
+}
+
+// helper unificado de add/update
+function saveItem(collection, id, item) {
+  if (id) DB.update(collection, id, item);
+  else DB.add(collection, item);
+}
+
+// ════════════════════════════════════════════════
+// FAMILIAS
+// ════════════════════════════════════════════════
+function renderFamilias() {
+  const q   = (document.getElementById('q-familias')?.value||'').toLowerCase();
+  const est = document.getElementById('f-estado-fam')?.value||'';
+  // Enriquecer con datos del alumno desde la fuente de verdad (alumnos)
+  const data = DB.get('familias').map(f=>{
+    const a = getAlumnoByCi(f.alumnoCI || f.ci || '');
+    return {...f,
+      _nombre: a?.apellidoNombre || f.alumno || '—',
+      _grado:  a?.curso || '—',
+      _ciclo:  a?.ciclo || a?.turno || '—',
+    };
+  }).filter(f=>
+    (!q   || f._nombre.toLowerCase().includes(q)) &&
+    (!est || f.estado===est)
+  ).map(f=>({...f,days:daysLeft(f.fechaLimite)}))
+   .sort((a,b)=>(a.days??9999)-(b.days??9999));
+
+  document.getElementById('cnt-familias').textContent = data.length + ' registros';
+
+  if (!data.length) {
+    document.getElementById('table-familias').innerHTML = `<div class="empty-state"><i class="bi bi-handshake"></i>No hay compromisos registrados.</div>`;
+    return;
+  }
+
+  document.getElementById('table-familias').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Alumno</th><th>F. Reunión</th><th>Compromiso / Acuerdo</th>
+        <th>Estado</th><th>Fecha Límite</th><th>Días Rest.</th>
+        <th>Próx. Reunión</th><th>Responsable</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((f,i)=>`<tr class="${rowCls(f.days)}">
+        <td style="color:#888">${i+1}</td>
+        <td><strong>${f._nombre}</strong><br><small style="color:#888">${f._grado} · ${f._ciclo}</small></td>
+        <td style="white-space:nowrap">${fmtDate(f.fechaReunion)}</td>
+        <td style="max-width:280px">${(f.acuerdo||'—').slice(0,90)}${(f.acuerdo||'').length>90?'…':''}</td>
+        <td>${estadoBadge(f.estado)}</td>
+        <td style="white-space:nowrap">${fmtDate(f.fechaLimite)}</td>
+        <td>${alertBadge(f.days)}</td>
+        <td style="white-space:nowrap">${fmtDate(f.proximaReunion)}</td>
+        <td><small>${f.responsable||'—'}</small></td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalFamilia('${f.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('familias','${f.id}',renderFamilias)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+function modalFamilia(id) {
+  const f = id ? DB.byId('familias',id) : {};
+  const ciActual = f.alumnoCI || f.ci || '';
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Compromiso':'Agregar Compromiso con Familia', `
+  <div class="row g-2">
+    ${selectorAlumnoHTML('fam', ciActual)}
+    <div class="col-md-4"><label class="form-label">Fecha de Reunión</label>
+      <input class="form-control" type="date" id="f_freu" value="${f.fechaReunion||today()}"></div>
+    <div class="col-md-8"><label class="form-label">Participantes</label>
+      <input class="form-control" id="f_part" value="${f.participantes||''}" placeholder="Quiénes asistieron"></div>
+    <div class="col-12"><label class="form-label">Acuerdo / Compromiso *</label>
+      <textarea class="form-control" id="f_acu" rows="3">${f.acuerdo||''}</textarea></div>
+    <div class="col-md-4"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Pendiente','Cumplido','Reprogramado','Incumplido'],f.estado||'Pendiente')}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha Límite</label>
+      <input class="form-control" type="date" id="f_flim" value="${f.fechaLimite||''}"></div>
+    <div class="col-md-4"><label class="form-label">Próxima Reunión</label>
+      <input class="form-control" type="date" id="f_fpro" value="${f.proximaReunion||''}"></div>
+    <div class="col-12"><label class="form-label">Seguimiento / Notas</label>
+      <textarea class="form-control" id="f_seg" rows="2">${f.seguimiento||''}</textarea></div>
+    <div class="col-md-6"><label class="form-label">Responsable</label>
+      <input class="form-control" id="f_res" value="${f.responsable||'Lic. Rodrigo Godoy'}"></div>
+    <div class="col-md-6"><label class="form-label">Firma / Constancia</label>
+      <input class="form-control" id="f_fir" value="${f.firma||''}"></div>
+  </div>`, ()=>{
+    const ci_fam = fld('fam_ci'), acu=fld('f_acu');
+    const alumnoFam = getAlumnoByCi(ci_fam);
+    if(!ci_fam){alert('La CI del alumno es requerida.');return;}
+    if(!alumnoFam){alert('CI no encontrada en Alumnos Inclusivos. Registrá el alumno primero.');return;}
+    if(!acu){alert('El compromiso/acuerdo es requerido.');return;}
+    saveItem('familias',id,{alumnoCI:ci_fam, fechaReunion:fld('f_freu'),participantes:fld('f_part'),
+      acuerdo:acu,estado:fld('f_est')||'Pendiente',fechaLimite:fld('f_flim'),
+      proximaReunion:fld('f_fpro'),seguimiento:fld('f_seg'),responsable:fld('f_res'),firma:fld('f_fir')});
+    closeModal(); renderFamilias();
+  });
+}
+
+// ════════════════════════════════════════════════
+// DOCUMENTOS MEC
+// ════════════════════════════════════════════════
+function renderDocumentos() {
+  const q   = (document.getElementById('q-docs')?.value||'').toLowerCase();
+  const est = document.getElementById('f-estado-docs')?.value||'';
+  const data = DB.get('documentos').filter(d=>
+    (!q   || (d.documento||'').toLowerCase().includes(q)) &&
+    (!est || d.estado===est)
+  ).map(d=>({...d,days:daysLeft(d.fechaLimite)}))
+   .sort((a,b)=>(a.days??9999)-(b.days??9999));
+
+  document.getElementById('cnt-docs').textContent = data.length + ' documentos';
+
+  if (!data.length) {
+    document.getElementById('table-documentos').innerHTML = `<div class="empty-state"><i class="bi bi-file-earmark-text"></i>No hay documentos registrados.</div>`;
+    return;
+  }
+
+  document.getElementById('table-documentos').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Documento / Trámite</th><th>Alumno(s)</th><th>Base Legal</th>
+        <th>Estado</th><th>Fecha Límite</th><th>Días Rest.</th>
+        <th>Dónde se presenta</th><th>Responsable</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((d,i)=>`<tr class="${rowCls(d.days)}">
+        <td style="color:#888">${i+1}</td>
+        <td><strong><small>${(d.documento||'—').slice(0,60)}</small></strong></td>
+        <td><small>${(d.alumnos||'—').slice(0,40)}</small></td>
+        <td><small style="color:#555">${(d.baseLegal||'—').slice(0,40)}</small></td>
+        <td>${estadoBadge(d.estado)}</td>
+        <td style="white-space:nowrap">${fmtDate(d.fechaLimite)}</td>
+        <td>${alertBadge(d.days)}</td>
+        <td><small>${(d.dondePresentar||'—').slice(0,45)}</small></td>
+        <td><small>${d.responsable||'—'}</small></td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalDocumento('${d.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('documentos','${d.id}',renderDocumentos)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+function modalDocumento(id) {
+  const d = id ? DB.byId('documentos',id) : {};
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Documento MEC':'Agregar Documento MEC', `
+  <div class="row g-2">
+    <div class="col-12"><label class="form-label">Documento / Trámite *</label>
+      <input class="form-control" id="f_doc" value="${d.documento||''}"></div>
+    <div class="col-md-6"><label class="form-label">Alumno(s)
+        <span style="font-size:10px;color:#2E75B6;font-weight:normal">— elegí de la lista o escribí "Todos"</span></label>
+      <input class="form-control" id="f_alu" list="dl-doc-alu"
+             value="${d.alumnos||'Todos los alumnos inclusivos'}"
+             placeholder="Todos o nombre del alumno">
+      <datalist id="dl-doc-alu">
+        <option value="Todos los alumnos inclusivos">
+        ${DB.get('alumnos').filter(a=>a.apellidoNombre).map(a=>`<option value="${a.apellidoNombre||''} — CI ${a.ci||''}">`)  .join('')}
+      </datalist></div>
+    <div class="col-md-6"><label class="form-label">Base Legal</label>
+      <input class="form-control" id="f_leg" value="${d.baseLegal||''}" placeholder="Ej: Ley 5136/2013 Art. 15"></div>
+    <div class="col-md-4"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Pendiente','En preparación','Presentado','Aprobado','Observado'],d.estado||'Pendiente')}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha Límite</label>
+      <input class="form-control" type="date" id="f_fecha" value="${d.fechaLimite||''}"></div>
+    <div class="col-md-4"><label class="form-label">Responsable</label>
+      <input class="form-control" id="f_res" value="${d.responsable||'Lic. Rodrigo Godoy'}"></div>
+    <div class="col-12"><label class="form-label">Dónde se presenta</label>
+      <input class="form-control" id="f_donde" value="${d.dondePresentar||''}"></div>
+    <div class="col-12"><label class="form-label">Observaciones</label>
+      <textarea class="form-control" id="f_obs" rows="2">${d.observaciones||''}</textarea></div>
+  </div>`, ()=>{
+    const doc=fld('f_doc'); if(!doc){alert('El nombre del documento es requerido.');return;}
+    saveItem('documentos',id,{documento:doc,alumnos:fld('f_alu'),baseLegal:fld('f_leg'),
+      estado:fld('f_est')||'Pendiente',fechaLimite:fld('f_fecha'),responsable:fld('f_res'),
+      dondePresentar:fld('f_donde'),observaciones:fld('f_obs')});
+    closeModal(); renderDocumentos();
+  });
+}
+
+// ════════════════════════════════════════════════
+// SEGUIMIENTO ACADÉMICO
+// ════════════════════════════════════════════════
+function renderSeguimiento() {
+  const q    = (document.getElementById('q-seg')?.value||'').toLowerCase();
+  const trim = document.getElementById('f-trim')?.value||'';
+  const mat  = document.getElementById('f-materia')?.value||'';
+  // Enriquecer seguimiento con datos actuales de alumnos (fuente de verdad)
+  const data = DB.get('seguimiento').map(s=>{
+    const a = getAlumnoByCi(s.ci);
+    return {...s,
+      _nombre:          a?.apellidoNombre || s.alumno || '—',
+      _tipoAdecuacion:  a?.tipoAdecuacion || s.tipoAdecuacion || '—',
+      _grado:           a?.curso || '—',
+    };
+  }).filter(s=>
+    (!q    || s._nombre.toLowerCase().includes(q)) &&
+    (!trim || s.trimestre===trim) &&
+    (!mat  || s.materia===mat)
+  );
+
+  // Populate materias filter
+  const materias = [...new Set(DB.get('seguimiento').map(s=>s.materia).filter(Boolean))].sort();
+  const selMat = document.getElementById('f-materia');
+  if (selMat) {
+    const cur = selMat.value;
+    selMat.innerHTML = '<option value="">Todas las materias</option>' +
+      materias.map(m=>`<option${m===cur?' selected':''}>${m}</option>`).join('');
+  }
+
+  document.getElementById('cnt-seg').textContent = data.length + ' registros';
+
+  if (!data.length) {
+    document.getElementById('table-seguimiento').innerHTML = `<div class="empty-state"><i class="bi bi-graph-up"></i>No hay registros de seguimiento.</div>`;
+    return;
+  }
+
+  document.getElementById('table-seguimiento').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>CI</th><th>Alumno</th><th>Materia</th><th>Período</th>
+        <th>Tipo Adecuación</th><th>Objetivo</th><th>Resultado</th>
+        <th>% Logro</th><th>Próx. Paso</th><th>Fecha</th><th>Docente</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((s,i)=>`<tr>
+        <td style="color:#888">${i+1}</td>
+        <td><small style="font-family:monospace;color:#555">${s.ci||'—'}</small></td>
+        <td><strong>${s._nombre}</strong><br><small style="color:#888">${s._grado}</small></td>
+        <td><small>${s.materia||'—'}</small></td>
+        <td><small>${s.trimestre||'—'}</small></td>
+        <td><small style="color:#375623;font-weight:600">${(s._tipoAdecuacion||'—').replace('Adecuación ','Adec. ')}</small></td>
+        <td style="max-width:140px"><small>${(s.objetivo||'—').slice(0,60)}${(s.objetivo||'').length>60?'…':''}</small></td>
+        <td style="max-width:120px"><small>${(s.resultado||'—').slice(0,55)}${(s.resultado||'').length>55?'…':''}</small></td>
+        <td>${pctBar(s.pctLogro)}</td>
+        <td style="max-width:120px"><small>${(s.proximoPaso||'—').slice(0,55)}${(s.proximoPaso||'').length>55?'…':''}</small></td>
+        <td style="white-space:nowrap"><small>${fmtDate(s.fechaRegistro)}</small></td>
+        <td><small>${s.docente||'—'}</small></td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalSeguimiento('${s.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('seguimiento','${s.id}',renderSeguimiento)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+// autoFillAlumno eliminada — reemplazada por fillAlumno() genérica con selectorAlumnoHTML()
+
+function modalSeguimiento(id) {
+  const s    = id ? DB.byId('seguimiento',id) : {};
+  const alus = DB.get('alumnos').filter(a=>a.ci);
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+
+  openModal(id?'Editar Registro de Seguimiento':'Agregar Registro de Seguimiento', `
+  <div class="row g-2">
+    ${selectorAlumnoHTML('seg', s.ci||'')}
+
+    <div class="col-md-5"><label class="form-label">Materia / Área</label>
+      <input class="form-control" id="f_mat" value="${s.materia||''}"></div>
+    <div class="col-md-4"><label class="form-label">Trimestre / Período</label>
+      <select class="form-select" id="f_tri"><option value=""></option>
+        ${opts(['1er Trimestre','2do Trimestre','3er Trimestre','Semestral','Anual'],s.trimestre)}</select></div>
+    <div class="col-md-3"><label class="form-label">% de Logro (0-100)</label>
+      <input class="form-control" type="number" min="0" max="100" id="f_pct" value="${s.pctLogro||''}"></div>
+
+    <div class="col-12"><label class="form-label">Objetivo Planteado</label>
+      <textarea class="form-control" id="f_obj" rows="2">${s.objetivo||''}</textarea></div>
+    <div class="col-12"><label class="form-label">Estrategia Utilizada</label>
+      <textarea class="form-control" id="f_est" rows="2">${s.estrategia||''}</textarea></div>
+    <div class="col-12"><label class="form-label">Resultado / Logro Observado</label>
+      <textarea class="form-control" id="f_res" rows="2">${s.resultado||''}</textarea></div>
+    <div class="col-12"><label class="form-label">Próximo Paso</label>
+      <textarea class="form-control" id="f_prox" rows="2">${s.proximoPaso||''}</textarea></div>
+    <div class="col-md-4"><label class="form-label">Fecha de Registro</label>
+      <input class="form-control" type="date" id="f_fecha" value="${s.fechaRegistro||today()}"></div>
+    <div class="col-md-8"><label class="form-label">Docente</label>
+      <input class="form-control" id="f_doc" value="${s.docente||''}"></div>
+  </div>`, ()=>{
+    const ci = fld('seg_ci');
+    const alumnoSeg = getAlumnoByCi(ci);
+    if (!ci)       { alert('La Cédula de Identidad es requerida.'); return; }
+    if (!alumnoSeg){ alert('CI no encontrada. Registrá el alumno en Alumnos Inclusivos primero.'); return; }
+    // Solo ci + datos propios — nombre, grado y tipoAdecuacion se derivan de alumnos en tiempo real
+    saveItem('seguimiento', id, {
+      ci, materia:fld('f_mat'), trimestre:fld('f_tri'),
+      pctLogro:fld('f_pct'), objetivo:fld('f_obj'),
+      estrategia:fld('f_est'), resultado:fld('f_res'),
+      proximoPaso:fld('f_prox'), fechaRegistro:fld('f_fecha'), docente:fld('f_doc'),
+    });
+    closeModal(); renderSeguimiento();
+  });
+}
+
+// ════════════════════════════════════════════════
+// CALENDARIO
+// ════════════════════════════════════════════════
+function renderCalendario() {
+  const mes  = document.getElementById('f-mes-cal')?.value||'';
+  const est  = document.getElementById('f-estado-cal')?.value||'';
+  const data = DB.get('calendario').filter(c=>
+    (!mes || c.mes===mes) && (!est || c.estado===est)
+  ).map(c=>({...c,days:daysLeft(c.fecha)}))
+   .sort((a,b)=>new Date(a.fecha||'9999-12-31')-new Date(b.fecha||'9999-12-31'));
+
+  document.getElementById('cnt-cal').textContent = data.length + ' eventos';
+
+  if (!data.length) {
+    document.getElementById('table-calendario').innerHTML = `<div class="empty-state"><i class="bi bi-calendar3"></i>No hay eventos en el calendario.</div>`;
+    return;
+  }
+
+  document.getElementById('table-calendario').innerHTML = `
+    <div class="table-responsive">
+    <table class="table table-sm table-hover">
+      <thead><tr>
+        <th>#</th><th>Mes</th><th>Acción / Evento</th><th>Fecha</th>
+        <th>Normativa</th><th>Destinatario</th><th>Estado</th><th>Días Rest.</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${data.map((c,i)=>`<tr class="${rowCls(c.days)}">
+        <td style="color:#888">${i+1}</td>
+        <td><strong>${c.mes||'—'}</strong></td>
+        <td>${c.accion||'—'}</td>
+        <td style="white-space:nowrap">${fmtDate(c.fecha)}</td>
+        <td><small style="color:#555">${c.normativa||'—'}</small></td>
+        <td><small>${c.destinatario||'—'}</small></td>
+        <td>${estadoBadge(c.estado||'Pendiente')}</td>
+        <td>${alertBadge(c.days)}</td>
+        <td class="text-nowrap">
+          <button class="btn-edit me-1" onclick="modalCalendario('${c.id}')"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-del" onclick="delItem('calendario','${c.id}',renderCalendario)"><i class="bi bi-trash-fill"></i></button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+function modalCalendario(id) {
+  const c = id ? DB.byId('calendario',id) : {};
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const opts = (list,cur) => list.map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
+  openModal(id?'Editar Evento':'Agregar Evento al Calendario', `
+  <div class="row g-2">
+    <div class="col-md-4"><label class="form-label">Mes</label>
+      <select class="form-select" id="f_mes"><option value=""></option>
+        ${opts(meses,c.mes)}</select></div>
+    <div class="col-md-4"><label class="form-label">Fecha</label>
+      <input class="form-control" type="date" id="f_fecha" value="${c.fecha||''}"></div>
+    <div class="col-md-4"><label class="form-label">Estado</label>
+      <select class="form-select" id="f_est">
+        ${opts(['Pendiente','En proceso','Completado','Reprogramado'],c.estado||'Pendiente')}</select></div>
+    <div class="col-12"><label class="form-label">Acción / Evento *</label>
+      <input class="form-control" id="f_acc" value="${c.accion||''}"></div>
+    <div class="col-md-6"><label class="form-label">Normativa</label>
+      <input class="form-control" id="f_nor" value="${c.normativa||''}" placeholder="Ej: Ley 5136/2013 Art. 15"></div>
+    <div class="col-md-6"><label class="form-label">Destinatario</label>
+      <input class="form-control" id="f_dest" value="${c.destinatario||''}"></div>
+  </div>`, ()=>{
+    const acc=fld('f_acc'); if(!acc){alert('La acción es requerida.');return;}
+    saveItem('calendario',id,{mes:fld('f_mes'),fecha:fld('f_fecha'),estado:fld('f_est')||'Pendiente',
+      accion:acc,normativa:fld('f_nor'),destinatario:fld('f_dest')});
+    closeModal(); renderCalendario();
+  });
+}
+
+// ════════════════════════════════════════════════
+// DELETE (universal)
+// ════════════════════════════════════════════════
+function delItem(collection, id, rerenderFn) {
+  if (confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) {
+    DB.del(collection, id);
+    rerenderFn();
+  }
+}
+
+// ════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ════════════════════════════════════════════════
+function exportarDatos() {
+  const data = {
+    alumnos:_mem.alumnos, familias:_mem.familias, documentos:_mem.documentos,
+    seguimiento:_mem.seguimiento, calendario:_mem.calendario,
+    exportado:new Date().toISOString(), version:'1.0',
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'backup_inclusivo_cerritos_'+today()+'.json';
+  a.click();
+}
+
+function importarDatos() {
+  if (!confirm('Importar datos reemplazará TODO el contenido actual. ¿Continuás?')) return;
+  document.getElementById('import-input').click();
+}
+
+function cargarArchivo(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d.alumnos)     _mem.alumnos     = d.alumnos;
+      if (d.familias)    _mem.familias    = d.familias;
+      if (d.documentos)  _mem.documentos  = d.documentos;
+      if (d.seguimiento) _mem.seguimiento = d.seguimiento;
+      if (d.calendario)  _mem.calendario  = d.calendario;
+      autoSave();
+      alert('Datos importados correctamente.');
+      renderDashboard();
+    } catch(err) { alert('Error al leer el archivo: '+err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ════════════════════════════════════════════════
+// PRELOAD (solo si están vacíos)
+// ════════════════════════════════════════════════
+function preload() {
+  if (!DB.get('documentos').length) {
+    [
+      {documento:'Planilla de matrícula inclusiva (Ficha de Registro)',alumnos:'Todos los alumnos nuevos inclusivos',baseLegal:'Res. MEC 29.664/2012 Art. 8',estado:'Pendiente',fechaLimite:'2026-03-15',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Sección de Educación Especial MEC / Supervisión'},
+      {documento:'Plan Educativo Individual (PEI) — Elaboración',alumnos:'Cada alumno inclusivo',baseLegal:'Ley 5136/2013 Art. 15 | Res. 29.664/2012',estado:'En preparación',fechaLimite:'2026-04-30',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional + copia Supervisión'},
+      {documento:'Informe de adecuaciones curriculares — 1er semestre',alumnos:'Todos los alumnos inclusivos',baseLegal:'Res. MEC 29.664/2012 Art. 12',estado:'Pendiente',fechaLimite:'2026-07-15',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa Departamental'},
+      {documento:'Informe de adecuaciones curriculares — 2do semestre',alumnos:'Todos los alumnos inclusivos',baseLegal:'Res. MEC 29.664/2012 Art. 12',estado:'Pendiente',fechaLimite:'2026-11-30',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa Departamental'},
+      {documento:'Evaluación psicopedagógica actualizada',alumnos:'Alumnos que requieren renovación',baseLegal:'Decreto 1.350/2019 Art. 22',estado:'Pendiente',fechaLimite:'2026-08-31',responsable:'Lic. Lea Cousirat',dondePresentar:'Centro de Diagnóstico MEC / archivo institucional'},
+      {documento:'Nómina de alumnos inclusivos por nivel',alumnos:'Todos los niveles',baseLegal:'Res. MEC 29.664/2012',estado:'Pendiente',fechaLimite:'2026-03-31',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa'},
+      {documento:'Constancia de diagnóstico médico/psicológico',alumnos:'Alumnos nuevos',baseLegal:'Ley 5136/2013 Art. 9',estado:'Pendiente',fechaLimite:'',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+      {documento:'Plan de Apoyos y Recursos (PAR)',alumnos:'Alumnos con adecuación significativa',baseLegal:'Decreto 1.350/2019',estado:'Pendiente',fechaLimite:'2026-05-15',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+      {documento:'Acta de compromiso familiar firmada',alumnos:'Cada familia de alumno inclusivo',baseLegal:'Res. MEC 29.664/2012',estado:'Pendiente',fechaLimite:'',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+      {documento:'Informe final anual de progreso',alumnos:'Todos los alumnos inclusivos',baseLegal:'Ley 5136/2013 Art. 16',estado:'Pendiente',fechaLimite:'2026-11-30',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Supervisión Educativa Departamental'},
+      {documento:'Solicitud de recursos de apoyo (intérprete, asistente)',alumnos:'Según necesidad',baseLegal:'Decreto 1.350/2019 Art. 30',estado:'Pendiente',fechaLimite:'2026-03-01',responsable:'Lic. Rodrigo Godoy',dondePresentar:'DGEEI - Dirección Gral. Ed. Especial e Inclusiva'},
+      {documento:'Certificado de discapacidad SENADIS actualizado',alumnos:'Alumnos que corresponda',baseLegal:'Ley 4962/2013',estado:'Pendiente',fechaLimite:'',responsable:'Lic. Rodrigo Godoy',dondePresentar:'Archivo institucional'},
+    ].forEach(d => DB.add('documentos', d));
+  }
+
+  if (!DB.get('calendario').length) {
+    [
+      // ── FEBRERO: apertura e inicio ──────────────────────────────────────
+      {mes:'Febrero',accion:'Actividades de pre-clases con énfasis en Educación Inclusiva — reuniones con padres/encargados/tutores. Identificación e incorporación de estudiantes fuera del sistema',fecha:'2026-02-10',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 4',destinatario:'Dirección / Docentes / Psicología',estado:'Pendiente'},
+      {mes:'Febrero',accion:'Matriculación y/o Confirmación de estudiantes en el RUE — Segunda Fase (matrícula inclusiva durante todo el año sin condicionamiento)',fecha:'2026-02-10',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 2',destinatario:'Secretaría',estado:'Pendiente'},
+      {mes:'Febrero',accion:'Reunión de Padres — 07:30hs (Calendario Institucional)',fecha:'2026-02-09',normativa:'Calendario Cerritos 2026',destinatario:'Dirección / Docentes',estado:'Pendiente'},
+      {mes:'Febrero',accion:'Pruebas Diagnósticas — con adecuaciones para alumnos inclusivos (16 al 20)',fecha:'2026-02-16',normativa:'Calendario Cerritos 2026',destinatario:'Docentes',estado:'Pendiente'},
+      {mes:'Febrero',accion:'Inicio oficial de actividades escolares',fecha:'2026-02-23',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 7',destinatario:'Todos los niveles',estado:'Pendiente'},
+      // ── MARZO: feriados y matrícula ─────────────────────────────────────
+      {mes:'Marzo',accion:'FERIADO — Día de los Héroes',fecha:'2026-03-01',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Marzo',accion:'Administración de pruebas de regularización (excepto 9° EEB, 3° EM, 4° Ciclo EBBPPJA y 4° Nivel EMPPJA)',fecha:'2026-03-02',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 10',destinatario:'Docentes',estado:'Pendiente'},
+      {mes:'Marzo',accion:'Nómina de alumnos inclusivos por nivel — entrega a Supervisión',fecha:'2026-03-31',normativa:'Res. MEC 29.664/2012',destinatario:'Dirección',estado:'Pendiente'},
+      // ── ABRIL: Semana Santa y PEI ───────────────────────────────────────
+      {mes:'Abril',accion:'FERIADO — Jueves y Viernes Santo (Semana Santa)',fecha:'2026-04-02',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Abril',accion:'ASUETO — Día del Maestro (Magisterio Nacional)',fecha:'2026-04-30',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Docentes',estado:'Pendiente'},
+      {mes:'Abril',accion:'Elaboración del Plan Educativo Individual (PEI) — plazo máximo de entrega',fecha:'2026-04-30',normativa:'Ley 5136/2013 Art.15 | Res. 29.664/2012',destinatario:'Docentes + Psicología',estado:'Pendiente'},
+      // ── MAYO: valoraciones y feriados ───────────────────────────────────
+      {mes:'Mayo',accion:'FERIADO — Día Internacional de los Trabajadores',fecha:'2026-05-01',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Mayo',accion:'Entrevistas con Padres NI, 1C y 2C — No hay clases (Calendario Institucional)',fecha:'2026-05-08',normativa:'Calendario Cerritos 2026',destinatario:'Dirección / Docentes',estado:'Pendiente'},
+      {mes:'Mayo',accion:'FERIADO — Día de la Patria y de la Madre (14 y 15)',fecha:'2026-05-14',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Mayo',accion:'Plan de Apoyos y Recursos (PAR) — entrega',fecha:'2026-05-15',normativa:'Decreto 1.350/2019',destinatario:'Coordinadores',estado:'Pendiente'},
+      {mes:'Mayo',accion:'INICIO Valoración de aprendizajes — 1ra etapa del año lectivo (25/05 al 11/06)',fecha:'2026-05-25',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 12',destinatario:'Docentes — aplicar adecuaciones curriculares',estado:'Pendiente'},
+      // ── JUNIO: valoración y feriados ────────────────────────────────────
+      {mes:'Junio',accion:'FERIADO — Día de la Paz del Chaco',fecha:'2026-06-12',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Junio',accion:'FIN Valoración de aprendizajes 1ra etapa (cierre 11/06). Inicio actividades 2da etapa: 22 de junio',fecha:'2026-06-22',normativa:'Res. MEC 2065/2025 — Anexo I Ítems 12 y 13',destinatario:'Docentes',estado:'Pendiente'},
+      // ── JULIO: rendición, invierno y regreso ────────────────────────────
+      {mes:'Julio',accion:'Rendición de Cuentas Públicas — 1ra etapa del año lectivo (Entrega de libretas + Entrevista con padres)',fecha:'2026-07-06',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 14 | Calendario Cerritos',destinatario:'Dirección / Docentes / Familias',estado:'Pendiente'},
+      {mes:'Julio',accion:'RECESO DE INVIERNO (13 al 24 de julio)',fecha:'2026-07-13',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 15',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Julio',accion:'Retorno a actividades académicas — 2da etapa',fecha:'2026-07-27',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 16',destinatario:'Todos los niveles',estado:'Pendiente'},
+      // ── AGOSTO: feriado y psicopedagogía ────────────────────────────────
+      {mes:'Agosto',accion:'FERIADO — Día de la Fundación de Asunción',fecha:'2026-08-15',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Agosto',accion:'Evaluaciones psicopedagógicas — plazo de renovación para alumnos inclusivos',fecha:'2026-08-31',normativa:'Decreto 1.350/2019 Art.22',destinatario:'Lic. Lea Cousirat — Psicología',estado:'Pendiente'},
+      // ── SEPTIEMBRE: entrevistas y feriado ───────────────────────────────
+      {mes:'Septiembre',accion:'Entrevistas con padres NI, 1° y 2° Ciclos — No hay clases (Calendario Institucional)',fecha:'2026-09-01',normativa:'Calendario Cerritos 2026',destinatario:'Dirección / Docentes',estado:'Pendiente'},
+      {mes:'Septiembre',accion:'FERIADO — Día de la Victoria de la Batalla de Boquerón (trasladable)',fecha:'2026-09-29',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      // ── OCTUBRE: valoración 2da etapa ───────────────────────────────────
+      {mes:'Octubre',accion:'Revisión PEI — ajuste para 2do semestre',fecha:'2026-10-15',normativa:'Ley 5136/2013',destinatario:'Docentes + Psicología',estado:'Pendiente'},
+      // ── NOVIEMBRE: valoración, clausura inclusiva y fin de clases ────────
+      {mes:'Noviembre',accion:'INICIO Valoración de aprendizajes — 2da etapa (09 al 30/11) — sin suspensión de clases. Aplicar adecuaciones curriculares',fecha:'2026-11-09',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 18',destinatario:'Docentes — adecuaciones en evaluación',estado:'Pendiente'},
+      {mes:'Noviembre',accion:'Informe de adecuaciones curriculares 2do semestre — entrega a Supervisión',fecha:'2026-11-16',normativa:'Res. MEC 29.664/2012 Art.12',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Noviembre',accion:'CLAUSURA de actividades pedagógicas — Ofertas Educativas No Formales de Educación Inclusiva (16 al 27/11)',fecha:'2026-11-16',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 20',destinatario:'Dirección / Coord. Inclusiva',estado:'Pendiente'},
+      {mes:'Noviembre',accion:'Entrega de Libretas y Entrevista con Padres (NI al Nivel Medio) — Calendario Institucional',fecha:'2026-11-27',normativa:'Calendario Cerritos 2026',destinatario:'Dirección / Docentes / Familias',estado:'Pendiente'},
+      {mes:'Noviembre',accion:'Informe final anual de progreso inclusivo — entrega a Supervisión',fecha:'2026-11-30',normativa:'Ley 5136/2013 Art.16',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Noviembre',accion:'FINALIZACIÓN DE CLASES',fecha:'2026-11-30',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 21',destinatario:'Todos los niveles',estado:'Pendiente'},
+      // ── DICIEMBRE: cierre institucional ─────────────────────────────────
+      {mes:'Diciembre',accion:'Rendición de Cuentas Públicas 2da etapa y cierre del año lectivo (01 al 07/12)',fecha:'2026-12-01',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 23',destinatario:'Dirección',estado:'Pendiente'},
+      {mes:'Diciembre',accion:'FERIADO — Día de la Virgen de Caacupé',fecha:'2026-12-08',normativa:'Res. MEC 2065/2025 — Anexo II',destinatario:'Toda la institución',estado:'Pendiente'},
+      {mes:'Diciembre',accion:'Culminación de actividades del personal docente y técnico-administrativo — Cierre del año lectivo',fecha:'2026-12-11',normativa:'Res. MEC 2065/2025 — Anexo I Ítem 26',destinatario:'Dirección / Personal docente',estado:'Pendiente'},
+    ].forEach(c => DB.add('calendario', c));
+  }
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+async function initApp() {
+  const ok = await tryReconnect();
+  if (ok) {
+    migrarDatos(); // normaliza datos legacy si existen
+    preload();
+    updateFileStatus();
+    renderDashboard();
+    const ov = document.getElementById('startup-overlay');
+    if (ov) ov.remove();
+  }
+  // Si no reconectó, el overlay queda visible esperando acción del usuario
+}
+initApp();
+</script>
+
+<!-- ═══════════════ STARTUP OVERLAY ═══════════════ -->
+<div id="startup-overlay" style="position:fixed;inset:0;background:rgba(31,56,100,.97);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif">
+  <div style="background:#fff;border-radius:14px;padding:40px 44px;max-width:460px;width:92%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+    <div style="width:56px;height:56px;background:#DEEAF1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+      <i class="bi bi-mortarboard-fill" style="font-size:26px;color:#1F3864"></i>
+    </div>
+    <div style="font-size:11px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Colegio Presbiteriano Cerritos</div>
+    <div style="font-size:20px;font-weight:700;color:#1F3864;margin-bottom:6px">Sistema de Educación Inclusiva</div>
+    <div style="font-size:12.5px;color:#666;margin-bottom:28px;line-height:1.5">Los datos se guardan directamente en un archivo <strong>.json</strong> en tu computadora.<br>Seleccioná qué querés hacer:</div>
+
+    <button onclick="arrancarConArchivo(false)" style="width:100%;padding:13px 16px;background:#2E75B6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <i class="bi bi-folder2-open" style="font-size:17px"></i> Abrir archivo existente
+    </button>
+    <button onclick="arrancarConArchivo(true)" style="width:100%;padding:13px 16px;background:#fff;color:#2E75B6;border:2px solid #2E75B6;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <i class="bi bi-file-earmark-plus" style="font-size:17px"></i> Crear archivo nuevo de datos
+    </button>
+
+    <div id="startup-msg" style="font-size:11.5px;color:#C55A11;min-height:18px"></div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #eee;font-size:10.5px;color:#bbb;line-height:1.6">
+      <i class="bi bi-shield-check me-1"></i>Los datos nunca salen de tu computadora &nbsp;·&nbsp;
+      Compatible con Chrome y Edge
+    </div>
+  </div>
+</div>
+</body>
+</html>

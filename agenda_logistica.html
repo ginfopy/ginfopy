@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Logística</title>
+<style>
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3350;
+  --accent:#4f7cff;--accent2:#7c5cfc;--text:#e8eaf6;--text2:#8b90b3;
+  --red:#ff5252;--orange:#ff9800;--yellow:#ffd740;
+  --green:#69f0ae;--teal:#40c4ff;--purple:#ce93d8;
+  --celeste:#4fc3f7;--celeste-bg:rgba(79,195,247,.10);--celeste-bd:rgba(79,195,247,.30);
+  --done-bg:rgba(105,240,174,.05);--radius:10px;--bar-h:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:var(--bar-h);}
+
+/* ── TOOLBAR ── */
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:80;height:var(--bar-h);background:rgba(26,29,39,.96);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);display:flex;align-items:center;padding:0 18px;gap:10px;}
+.tb-brand{display:flex;align-items:center;gap:7px;font-weight:700;font-size:.97rem;flex:1;white-space:nowrap;overflow:hidden;}
+.tb-brand .icon{font-size:1.2rem;}
+.tb-brand .sub{font-size:.68rem;color:var(--text2);font-weight:400;margin-left:2px;display:none;}
+@media(min-width:600px){.tb-brand .sub{display:inline;}}
+.tb-icons{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;border:none;border-radius:7px;cursor:pointer;font-size:.77rem;font-weight:600;padding:6px 11px;transition:opacity .15s,transform .1s;white-space:nowrap;}
+.tb-btn:hover{opacity:.87;transform:translateY(-1px);}
+.tb-add{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.tb-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.tb-ghost.active{background:rgba(79,124,255,.14);color:var(--accent);border-color:rgba(79,124,255,.38);}
+
+/* ── FILTER DROPDOWN ── */
+.filter-wrap{position:relative;}
+.filter-panel{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;min-width:224px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:200;animation:mIn .15s ease;}
+.filter-panel.open{display:block;}
+.fp-title{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);padding:6px 10px 4px;}
+.fp-sep{border:none;border-top:1px solid var(--border);margin:5px 0;}
+.fp-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:.8rem;color:var(--text2);transition:background .12s,color .12s;border:none;background:transparent;width:100%;text-align:left;}
+.fp-opt:hover{background:var(--surface2);color:var(--text);}
+.fp-opt.sel{background:rgba(79,124,255,.12);color:var(--accent);}
+.fp-opt.sel .fp-dot{border-color:var(--accent);background:var(--accent);}
+.fp-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .12s;}
+.fp-opt:hover .fp-dot{border-color:var(--text2);}
+.fp-count{margin-left:auto;font-size:.7rem;opacity:.6;}
+
+/* ── MAIN ── */
+.main{max-width:1200px;margin:0 auto;padding:18px 14px 56px;}
+.stats-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.stat-chip{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.76rem;color:var(--text2);display:flex;align-items:center;gap:5px;}
+.stat-chip .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.heat-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.72rem;color:var(--text2);margin-bottom:12px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+.heat-legend .swatches{display:flex;gap:2px;}
+.heat-legend .swatch{width:18px;height:9px;border-radius:2px;opacity:.85;}
+
+/* ── TABLE ── */
+.table-wrap{border-radius:var(--radius);border:1px solid var(--border);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.82rem;}
+thead th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:.69rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);font-weight:600;white-space:nowrap;border-bottom:1px solid var(--border);}
+tbody td{padding:9px 12px;vertical-align:middle;white-space:nowrap;border-bottom:1px solid var(--border);}
+tbody td.wrap-cell{white-space:normal;min-width:170px;}
+tbody tr:last-child td{border-bottom:none;}
+tr.date-sep td{background:var(--surface2);padding:6px 14px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--text2);border-bottom:1px solid var(--border);}
+tr.date-sep .ds-date{color:var(--text);font-size:.8rem;}
+tr.date-sep .ds-cd{font-weight:700;padding:1px 8px;border-radius:9px;margin-left:6px;}
+tr.row-event{background:var(--celeste-bg);}
+tr.row-event:hover{background:rgba(79,195,247,.16);}
+tr.row-logistics:hover{filter:brightness(1.1);}
+tr.is-done{opacity:.42;}
+tr.is-done .td-name{text-decoration:line-through;}
+tr.is-done{background:var(--done-bg)!important;}
+
+/* ── BADGES ── */
+.type-tag{display:inline-flex;align-items:center;gap:4px;font-size:.69rem;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.type-tag-event{background:rgba(79,195,247,.14);color:var(--celeste);border:1px solid rgba(79,195,247,.28);}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;white-space:nowrap;}
+.badge-vencido{background:rgba(255,82,82,.15);color:var(--red);border:1px solid rgba(255,82,82,.3);}
+.badge-hoy{background:rgba(255,152,0,.15);color:var(--orange);border:1px solid rgba(255,152,0,.3);}
+.badge-urgente{background:rgba(255,215,64,.12);color:var(--yellow);border:1px solid rgba(255,215,64,.3);}
+.badge-proximo{background:rgba(105,240,174,.10);color:var(--green);border:1px solid rgba(105,240,174,.25);}
+.badge-lejano{background:rgba(64,196,255,.10);color:var(--teal);border:1px solid rgba(64,196,255,.25);}
+
+/* ── PROGRESS BAR ── */
+.log-progress{display:inline-flex;align-items:center;gap:5px;margin-left:10px;vertical-align:middle;}
+.log-progress-track{display:block;width:80px;height:6px;background:rgba(255,255,255,.10);border-radius:4px;overflow:hidden;flex-shrink:0;}
+.log-progress-fill{display:block;height:6px;border-radius:4px;transition:width .4s ease;}
+.log-progress-pct{font-size:.68rem;font-weight:700;min-width:30px;text-align:right;}
+
+/* ── DONE / ACTIONS ── */
+.btn-done{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:.85rem;transition:all .15s;}
+.btn-done:hover{border-color:var(--green);color:var(--green);}
+.btn-done.is-done{background:rgba(105,240,174,.18);border-color:var(--green);color:var(--green);}
+.btn-actions{display:flex;gap:4px;}
+.btn-edit{background:transparent;border:1px solid rgba(79,124,255,.35);color:var(--accent);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:.7rem;transition:background .12s;}
+.btn-edit:hover{background:rgba(79,124,255,.12);}
+.btn-del{background:transparent;border:1px solid rgba(255,82,82,.35);color:var(--red);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:.7rem;transition:background .12s;}
+.btn-del:hover{background:rgba(255,82,82,.12);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:52px 20px;color:var(--text2);}
+.empty svg{margin-bottom:14px;opacity:.22;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 24px 20px;width:100%;max-width:520px;margin:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:mIn .17s ease;}
+.modal-wide{max-width:660px;}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal h2{font-size:.97rem;font-weight:700;margin-bottom:16px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.f-full{grid-column:1/-1;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:.7rem;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:.5px;}
+.fg input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:.86rem;outline:none;transition:border-color .2s;}
+.fg input:focus{border-color:var(--accent);}
+.fg input::placeholder{color:var(--text2);opacity:.5;}
+.modal-footer{margin-top:16px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.btn-cancel{background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:7px 16px;cursor:pointer;font-size:.85rem;}
+.btn-cancel:hover{border-color:var(--text2);}
+.btn-save{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:6px;color:#fff;font-size:.85rem;font-weight:600;padding:7px 20px;cursor:pointer;}
+.btn-save:hover{opacity:.88;}
+
+/* ── BOTONES SOLO / MUTE ── */
+.btn-solo{background:rgba(79,124,255,.12);border:1px solid rgba(79,124,255,.38);color:var(--accent);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.7rem;font-weight:800;transition:all .13s;letter-spacing:.5px;}
+.btn-solo:hover,.btn-solo.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-mute{background:rgba(255,152,0,.10);border:1px solid rgba(255,152,0,.38);color:var(--orange);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.7rem;font-weight:800;transition:all .13s;letter-spacing:.5px;}
+.btn-mute:hover,.btn-mute.active{background:var(--orange);color:#0f1117;border-color:var(--orange);}
+/* Banner filtro rápido activo */
+.quick-filter-bar{display:flex;align-items:center;gap:8px;padding:7px 14px;margin-bottom:10px;border-radius:8px;font-size:.78rem;}
+.quick-filter-bar.solo{background:rgba(79,124,255,.12);border:1px solid rgba(79,124,255,.3);color:var(--accent);}
+.quick-filter-bar.mute{background:rgba(255,152,0,.10);border:1px solid rgba(255,152,0,.3);color:var(--orange);}
+.qf-clear{background:transparent;border:1px solid currentColor;border-radius:4px;color:inherit;padding:2px 8px;cursor:pointer;font-size:.72rem;margin-left:auto;}
+.qf-clear:hover{opacity:.75;}
+
+/* ── IMPORT ── */
+.import-preview{max-height:200px;overflow-y:auto;margin-top:10px;border:1px solid var(--border);border-radius:6px;}
+.import-preview table{width:100%;border-collapse:collapse;font-size:.73rem;}
+.import-preview th{background:var(--surface2);padding:5px 8px;color:var(--text2);font-weight:600;font-size:.67rem;text-transform:uppercase;}
+.import-preview td{padding:5px 8px;border-top:1px solid var(--border);color:var(--text);}
+.import-preview .row-err td{color:var(--red);background:rgba(255,82,82,.05);}
+.import-ta{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:.78rem;font-family:'Courier New',monospace;resize:vertical;outline:none;}
+.import-ta:focus{border-color:var(--accent);}
+
+/* ── HOY HIGHLIGHT (colores invertidos solo en el separador de fecha) ── */
+tr.today-sep td{
+  background:var(--orange)!important;
+  border-top:2px solid rgba(0,0,0,.10)!important;
+  border-bottom:2px solid rgba(0,0,0,.15)!important;
+}
+tr.today-sep .ds-date{color:#0f1117!important;font-weight:800;font-size:.85rem;}
+tr.today-sep .ds-day {color:rgba(15,17,23,.60)!important;}
+/* filas del día: leve tinte para mantener coherencia visual */
+tr.today-row{background:rgba(255,152,0,.06)!important;}
+tr.today-row.is-done{background:var(--done-bg)!important;}
+
+/* ── SLIDER DÍAS ── */
+.slider-wrap{display:flex;align-items:center;gap:12px;margin-top:6px;}
+.slider-dias{flex:1;accent-color:var(--accent);cursor:pointer;height:6px;appearance:none;-webkit-appearance:none;background:var(--surface2);border-radius:3px;outline:none;border:1px solid var(--border);}
+.slider-dias::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;border:2px solid var(--bg);box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.slider-dias::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;border:2px solid var(--bg);}
+.slider-val{font-size:1.05rem;font-weight:800;color:var(--accent);min-width:32px;text-align:center;background:rgba(79,124,255,.12);border:1px solid rgba(79,124,255,.3);border-radius:6px;padding:2px 6px;}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- ── TOOLBAR ── -->
+<header class="toolbar">
+  <div class="tb-brand">
+    <span class="icon">📅</span>
+    <span>Agenda Logística</span>
+    <span class="sub">Colegio Presbiteriano Cerritos</span>
+  </div>
+  <nav class="tb-icons">
+    <div class="filter-wrap" id="filterWrap">
+      <button class="tb-btn tb-ghost" id="btnTipoFiltro" onclick="toggleFilterPanel()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <span id="tipoFiltroLabel">Filtrar</span>
+      </button>
+      <div class="filter-panel" id="filterPanel">
+        <div class="fp-title">Mostrar en la lista</div>
+        <button class="fp-opt sel" id="fp-all"        onclick="setTipoFiltro('all')">        <span class="fp-dot"></span>Todos los registros      <span class="fp-count" id="cnt-all"></span></button>
+        <button class="fp-opt"    id="fp-event"       onclick="setTipoFiltro('event')">       <span class="fp-dot"></span>Solo eventos principales <span class="fp-count" id="cnt-event"></span></button>
+        <button class="fp-opt"    id="fp-logistics"   onclick="setTipoFiltro('logistics')">   <span class="fp-dot"></span>Solo logística           <span class="fp-count" id="cnt-logistics"></span></button>
+        <hr class="fp-sep">
+        <button class="fp-opt"    id="fp-hoy"         onclick="setTipoFiltro('hoy')">         <span class="fp-dot"></span>Solo eventos de hoy      <span class="fp-count" id="cnt-hoy"></span></button>
+        <button class="fp-opt"    id="fp-completados" onclick="setTipoFiltro('completados')"> <span class="fp-dot"></span>Solo completados         <span class="fp-count" id="cnt-completados"></span></button>
+      </div>
+    </div>
+    <button class="tb-btn tb-ghost" id="btnFilter" onclick="toggleFilter()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <span id="filterLabel">Ver completados</span>
+    </button>
+    <button class="tb-btn tb-ghost" onclick="abrirImport()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Importar
+    </button>
+    <button class="tb-btn tb-ghost" onclick="exportarEventos()" title="Descargar respaldo JSON">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Respaldo
+    </button>
+    <label class="tb-btn tb-ghost" title="Restaurar desde archivo JSON de respaldo" style="cursor:pointer;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Restaurar
+      <input type="file" accept=".json" style="display:none;" onchange="abrirRestaurar(this)"/>
+    </label>
+    <button class="tb-btn tb-add" onclick="abrirFormAdd()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo evento
+    </button>
+  </nav>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="stats-row" id="statsRow"></div>
+  <div id="quickFilterBar"></div>
+  <div id="heatLegend"></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34px;">#</th>
+          <th>Tipo</th>
+          <th class="wrap-cell">Descripción / Evento</th>
+          <th>Logística</th>
+          <th>Inicio evento</th>
+          <th>Fin evento</th>
+          <th>Estado</th>
+          <th>Días rest.</th>
+          <th style="width:38px;">✓</th>
+          <th style="min-width:90px;"></th>
+        </tr>
+      </thead>
+      <tbody id="tBody">
+        <tr><td colspan="10"><div class="empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <div>No hay eventos registrados.<br>Usá el botón <strong>+ Nuevo evento</strong> para comenzar.</div>
+        </div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- ── MODAL AGREGAR ── -->
+<div class="modal-overlay" id="addOverlay" onclick="cerrarAdd(event)">
+  <div class="modal">
+    <h2>➕ Nuevo Evento</h2>
+    <div class="form-grid">
+      <div class="fg f-full"><label>Nombre / Descripción</label><input id="aNombre" type="text" placeholder="Ej: Acto de graduación"/></div>
+      <div class="fg"><label>Fecha Inicio</label><input id="aInicio" type="date" oninput="document.getElementById('aFin').value=this.value"/></div>
+      <div class="fg"><label>Fecha Fin</label><input id="aFin" type="date"/></div>
+      <div class="fg f-full">
+        <label>Días hábiles de logística previa</label>
+        <div class="slider-wrap">
+          <input id="aDias" type="range" min="0" max="20" value="0" class="slider-dias" oninput="document.getElementById('aDiasVal').textContent=this.value"/>
+          <span id="aDiasVal" class="slider-val">0</span>
+        </div>
+      </div>
+    </div>
+    <div id="aError" style="color:var(--red);font-size:.8rem;margin-top:8px;"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarAdd()">Cancelar</button>
+      <button class="btn-save" onclick="agregarEvento()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL EDITAR ── -->
+<div class="modal-overlay" id="editOverlay" onclick="cerrarEdit(event)">
+  <div class="modal">
+    <h2>✏️ Editar Evento</h2>
+    <div class="form-grid">
+      <div class="fg f-full"><label>Nombre / Descripción</label><input id="mNombre" type="text"/></div>
+      <div class="fg"><label>Fecha Inicio</label><input id="mInicio" type="date"/></div>
+      <div class="fg"><label>Fecha Fin</label><input id="mFin" type="date"/></div>
+      <div class="fg f-full">
+        <label>Días hábiles de logística previa</label>
+        <div class="slider-wrap">
+          <input id="mDias" type="range" min="1" max="20" value="5" class="slider-dias" oninput="document.getElementById('mDiasVal').textContent=this.value"/>
+          <span id="mDiasVal" class="slider-val">5</span>
+        </div>
+      </div>
+    </div>
+    <div id="mError" style="color:var(--red);font-size:.8rem;margin-top:8px;"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarEdit()">Cancelar</button>
+      <button class="btn-save" onclick="guardarEdicion()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL IMPORTAR ── -->
+<div class="modal-overlay" id="importOverlay" onclick="cerrarImport(event)">
+  <div class="modal modal-wide">
+    <h2>📥 Importar eventos desde archivo</h2>
+    <p style="font-size:.78rem;color:var(--text2);margin-bottom:12px;line-height:1.6;">
+      Formato: <code style="background:var(--surface2);padding:1px 6px;border-radius:4px;font-size:.73rem;">descripción, DD/MM/AAAA inicio, DD/MM/AAAA fin, días logística</code><br>
+      Si no hay fecha fin se usa la de inicio. Separador: coma.
+    </p>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+      <label class="tb-btn tb-ghost" style="cursor:pointer;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Abrir .txt
+        <input type="file" id="importFile" accept=".txt,.csv,.json" style="display:none;" onchange="leerArchivoImport(this)"/>
+      </label>
+      <span style="color:var(--text2);font-size:.74rem;">— o pegá el texto —</span>
+    </div>
+    <textarea class="import-ta" id="importTA" rows="5" placeholder="Graduación 2026, 20/06/2026, 25/06/2026, 7&#10;Día del Maestro, 11/09/2026, , 3" oninput="previsualizarImport()"></textarea>
+    <div id="importPreview"></div>
+    <div id="importMsg" style="font-size:.78rem;margin-top:8px;"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarImport()">Cancelar</button>
+      <button class="btn-save" id="btnConfirmImport" onclick="confirmarImport()" disabled>Importar eventos</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────
+let eventos = JSON.parse(localStorage.getItem('agendaEventos') || '[]');
+let editandoId = null;
+let mostrarCompletados = false;
+let tipoFiltro = 'all';
+let importParsed = [];
+let filtroSoloId = null;   // S: mostrar solo este evento y su logística
+let filtroMuteId = null;   // M: ocultar este evento y su logística
+
+function guardar(){ localStorage.setItem('agendaEventos', JSON.stringify(eventos)); }
+
+// ── HELPERS FECHA ─────────────────────────────────────────
+const DIAS       = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const DIAS_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+function hoy(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+function parseFecha(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function dateToStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function fmtFecha(s){ const d=parseFecha(s); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; }
+function diasRestantes(s){ return Math.round((parseFecha(s)-hoy())/86400000); }
+function diasHabilesPrevios(ini,n){
+  const r=[],cur=parseFecha(ini);
+  while(r.length<n){ cur.setDate(cur.getDate()-1); if(cur.getDay()!==0&&cur.getDay()!==6) r.push(dateToStr(new Date(cur))); }
+  return r;
+}
+
+// ── DONE STATE ────────────────────────────────────────────
+function isDone(fila){
+  if(fila.tipo==='event') return fila.ev.done===true;
+  return Array.isArray(fila.ev.doneLogs) && fila.ev.doneLogs.includes(fila.fechaClave);
+}
+function toggleDone(evId,tipo,fechaClave){
+  const ev=eventos.find(e=>e.id===evId); if(!ev) return;
+  if(tipo==='event'){
+    ev.done=!ev.done;
+  } else {
+    if(!ev.doneLogs) ev.doneLogs=[];
+    const i=ev.doneLogs.indexOf(fechaClave);
+    if(i>=0) ev.doneLogs.splice(i,1); else ev.doneLogs.push(fechaClave);
+  }
+  guardar(); render();
+}
+
+// ── FILTROS RÁPIDOS S / M ─────────────────────────────────
+function filtrarSolo(id){
+  filtroSoloId = (filtroSoloId === id) ? null : id;
+  filtroMuteId = null;
+  render();
+}
+function filtrarMute(id){
+  filtroMuteId = (filtroMuteId === id) ? null : id;
+  filtroSoloId = null;
+  render();
+}
+function limpiarFiltroRapido(){
+  filtroSoloId = null;
+  filtroMuteId = null;
+  render();
+}
+
+// ── FILTROS ───────────────────────────────────────────────
+function toggleFilter(){
+  mostrarCompletados=!mostrarCompletados;
+  document.getElementById('filterLabel').textContent=mostrarCompletados?'Ocultar completados':'Ver completados';
+  document.getElementById('btnFilter').classList.toggle('active',mostrarCompletados);
+  render();
+}
+function toggleFilterPanel(){ document.getElementById('filterPanel').classList.toggle('open'); }
+function cerrarFilterPanel(){ document.getElementById('filterPanel').classList.remove('open'); }
+function setTipoFiltro(val){
+  tipoFiltro=val;
+  ['all','event','logistics','hoy','completados'].forEach(k=>{
+    document.getElementById('fp-'+k).classList.toggle('sel',k===val);
+  });
+  const labels={all:'Filtrar',event:'Eventos',logistics:'Logística',hoy:'Hoy',completados:'Completados'};
+  document.getElementById('tipoFiltroLabel').textContent=labels[val];
+  document.getElementById('btnTipoFiltro').classList.toggle('active',val!=='all');
+  cerrarFilterPanel(); render();
+}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('filterWrap').contains(e.target)) cerrarFilterPanel();
+});
+
+// ── CALOR ─────────────────────────────────────────────────
+function heatRgb(ratio){
+  const stops=[[64,196,255],[105,240,174],[255,215,64],[255,152,0],[255,82,82]];
+  const s=Math.max(0,Math.min(1,ratio))*(stops.length-1);
+  const i=Math.min(Math.floor(s),stops.length-2),t=s-i;
+  const [r1,g1,b1]=stops[i],[r2,g2,b2]=stops[i+1];
+  return [Math.round(r1+(r2-r1)*t),Math.round(g1+(g2-g1)*t),Math.round(b1+(b2-b1)*t)];
+}
+function hCol(r){const[a,b,c]=heatRgb(r);return`rgb(${a},${b},${c})`;}
+function hBg(r){const[a,b,c]=heatRgb(r);return`rgba(${a},${b},${c},.09)`;}
+function hBd(r){const[a,b,c]=heatRgb(r);return`rgba(${a},${b},${c},.28)`;}
+
+// ── STATUS ────────────────────────────────────────────────
+function statusInfo(dr){
+  if(dr<0)  return{cls:'badge-vencido',label:'Vencido'};
+  if(dr===0)return{cls:'badge-hoy',    label:'¡Hoy!'};
+  if(dr<=3) return{cls:'badge-urgente',label:'Urgente'};
+  if(dr<=14)return{cls:'badge-proximo',label:'Próximo'};
+  return{cls:'badge-lejano',label:'Programado'};
+}
+function drLabel(dr){
+  const abs=Math.abs(dr);
+  const d1=n=>(n===1?'Día':'Días');
+  if(dr<0)  return`<span style="color:var(--red);font-weight:700;">${abs} ${d1(abs)} atrás</span>`;
+  if(dr===0)return`<span style="color:var(--orange);font-weight:800;">HOY</span>`;
+  return`<span style="color:${dr<=3?'var(--yellow)':dr<=14?'var(--green)':'var(--teal)'};font-weight:700;">${dr} ${d1(dr)}</span>`;
+}
+function pctColor(p){
+  if(p>=100)return'#69f0ae';if(p>=75)return'#a5d6a7';
+  if(p>=50)return'#ffd740';if(p>=25)return'#ff9800';
+  return'#4fc3f7';
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function render(){
+  const todasFilas=[];
+  eventos.forEach(ev=>{
+    const n=parseInt(ev.diasPrev)||0;
+    todasFilas.push({tipo:'event',fechaClave:ev.inicio,ev,total:n});
+    if(n>0) diasHabilesPrevios(ev.inicio,n).forEach((fecha,idx)=>{
+      const ratio=n===1?1:(n-1-idx)/(n-1);
+      todasFilas.push({tipo:'logistics',fechaClave:fecha,ev,ratio,diaNum:n-idx,total:n});
+    });
+  });
+  todasFilas.sort((a,b)=>parseFecha(a.fechaClave)-parseFecha(b.fechaClave));
+
+  // Contadores filtro
+  const hoyStr=dateToStr(hoy());
+  const cnts=[
+    todasFilas.length,
+    todasFilas.filter(f=>f.tipo==='event').length,
+    todasFilas.filter(f=>f.tipo==='logistics').length,
+    todasFilas.filter(f=>f.fechaClave===hoyStr).length,
+    todasFilas.filter(f=>isDone(f)).length
+  ];
+  ['all','event','logistics','hoy','completados'].forEach((k,i)=>{
+    const el=document.getElementById('cnt-'+k);
+    if(el) el.textContent=cnts[i]||'';
+  });
+
+  // Aplicar filtros rápidos S / M (tienen prioridad sobre los otros filtros)
+  let filas;
+  if(filtroSoloId){
+    // SOLO: mostrar únicamente este evento y toda su logística (incluyendo completados)
+    filas = todasFilas.filter(f => f.ev.id === filtroSoloId);
+  } else {
+    // Pipeline normal de filtros
+    filas = todasFilas;
+    if(tipoFiltro==='event')            filas=todasFilas.filter(f=>f.tipo==='event');
+    else if(tipoFiltro==='logistics')   filas=todasFilas.filter(f=>f.tipo==='logistics');
+    else if(tipoFiltro==='hoy')         filas=todasFilas.filter(f=>f.fechaClave===hoyStr);
+    else if(tipoFiltro==='completados') filas=todasFilas.filter(f=>isDone(f));
+    filas=(tipoFiltro==='completados')?filas:(mostrarCompletados?filas:filas.filter(f=>!isDone(f)));
+    // MUTE: excluir este evento y su logística del resultado
+    if(filtroMuteId) filas = filas.filter(f => f.ev.id !== filtroMuteId);
+  }
+
+  // Banner filtro rápido activo
+  const qfEl = document.getElementById('quickFilterBar');
+  if(filtroSoloId || filtroMuteId){
+    const evNombre = eventos.find(e=>e.id===(filtroSoloId||filtroMuteId))?.nombre || '';
+    const tipo = filtroSoloId ? 'solo' : 'mute';
+    const label = filtroSoloId
+      ? `🔍 Viendo solo: <strong>${evNombre}</strong>`
+      : `🔇 Ocultando: <strong>${evNombre}</strong>`;
+    qfEl.className = `quick-filter-bar ${tipo}`;
+    qfEl.innerHTML = `<span>${label}</span><button class="qf-clear" onclick="limpiarFiltroRapido()">✕ Quitar filtro</button>`;
+  } else {
+    qfEl.className = '';
+    qfEl.innerHTML = '';
+  }
+
+  const tbody=document.getElementById('tBody');
+
+  if(todasFilas.length===0){
+    tbody.innerHTML=`<tr><td colspan="10"><div class="empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div>No hay eventos registrados.<br>Usá el botón <strong>+ Nuevo evento</strong> para comenzar.</div>
+    </div></td></tr>`;
+    renderStats(todasFilas); renderHeatLegend(false); return;
+  }
+  if(filas.length===0){
+    const msg=tipoFiltro!=='all'
+      ?`Sin resultados para el filtro activo. <button onclick="setTipoFiltro('all')" style="color:var(--accent);background:none;border:none;cursor:pointer;font-size:.78rem;">Quitar filtro</button>`
+      :`Todos los registros están completados. <button onclick="toggleFilter()" style="color:var(--accent);background:none;border:none;cursor:pointer;font-size:.78rem;">Ver completados</button>`;
+    tbody.innerHTML=`<tr><td colspan="10"><div class="empty" style="padding:32px 20px;"><div style="font-size:1.5rem;margin-bottom:8px;">🔍</div><div>${msg}</div></div></td></tr>`;
+    renderStats(todasFilas); renderHeatLegend(todasFilas.some(f=>f.tipo==='logistics')); return;
+  }
+
+  // Agrupar por fecha
+  const groups={};
+  filas.forEach(f=>{(groups[f.fechaClave]||(groups[f.fechaClave]=[])).push(f);});
+
+  // Siempre mostrar ayer, hoy y mañana aunque no tengan eventos (excepto en modo Solo)
+  const ayer   = dateToStr(new Date(hoy().getTime() - 86400000));
+  const manana = dateToStr(new Date(hoy().getTime() + 86400000));
+  if(!filtroSoloId) [ayer, hoyStr, manana].forEach(d=>{ if(!groups[d]) groups[d]=[]; });
+
+  const dates=Object.keys(groups).sort();
+  let html='',rowNum=0,hayLog=false;
+
+  dates.forEach(fecha=>{
+    const items=groups[fecha],d=parseFecha(fecha),dr=diasRestantes(fecha);
+    let cdCol='var(--text2)',cdLabel='';
+    const d1=n=>(n===1?'Día':'Días');
+    if(dr<0){const a=Math.abs(dr);cdCol='var(--red)';cdLabel=`${a} ${d1(a)} atrás`;}
+    else if(dr===0){cdCol='var(--orange)';cdLabel='HOY';}
+    else if(dr<=3){cdCol='var(--yellow)';cdLabel=`en ${dr} ${d1(dr)}`;}
+    else if(dr<=14){cdCol='var(--green)';cdLabel=`en ${dr} ${d1(dr)}`;}
+    else{cdCol='var(--teal)';cdLabel=`en ${dr} ${d1(dr)}`;}
+
+    const isToday = fecha === hoyStr;
+    html+=`<tr class="date-sep${isToday?' today-sep':''}"><td colspan="10">
+      <span class="ds-date">${String(d.getDate()).padStart(2,'0')} ${MESES[d.getMonth()]} ${d.getFullYear()}</span>
+      <span class="ds-day">&nbsp;·&nbsp;${DIAS_FULL[d.getDay()]}</span>
+      ${isToday?`<span class="ds-cd" style="color:#0f1117;background:rgba(0,0,0,.14);border:1px solid rgba(0,0,0,.22);font-weight:800;">📍 HOY</span>`:cdLabel?`<span class="ds-cd" style="color:${cdCol};background:${cdCol}1a;border:1px solid ${cdCol}44;">${cdLabel}</span>`:''}
+    </td></tr>`;
+
+    if(items.length===0){
+      html+=`<tr style="background:${isToday?'rgba(255,152,0,.04)':'var(--bg)'};">
+        <td colspan="10" style="padding:10px 14px;font-size:.75rem;color:var(--text2);font-style:italic;border-bottom:1px solid var(--border);">— sin eventos —</td>
+      </tr>`;
+    }
+
+    items.forEach(fila=>{
+      rowNum++;
+      const done=isDone(fila),dr2=diasRestantes(fila.fechaClave);
+      if(fila.tipo==='logistics') hayLog=true;
+      const doneCls=done?'is-done':'';
+      const todayCls=isToday?'today-row':'';
+      const doneBtn=`<button class="btn-done${done?' is-done':''}" onclick="toggleDone('${fila.ev.id}','${fila.tipo}','${fila.fechaClave}')" title="${done?'Marcar pendiente':'Marcar realizado'}">${done?'✓':'○'}</button>`;
+      const isSolo = filtroSoloId === fila.ev.id;
+      const isMute = filtroMuteId === fila.ev.id;
+      const acciones=fila.tipo==='event'
+        ?`<div class="btn-actions">
+            <button class="btn-edit" onclick="abrirEdit('${fila.ev.id}')">✏️</button>
+            <button class="btn-del"  onclick="eliminar('${fila.ev.id}')">🗑</button>
+            <button class="btn-solo${isSolo?' active':''}" onclick="filtrarSolo('${fila.ev.id}')" title="Solo este evento y su logística">S</button>
+            <button class="btn-mute${isMute?' active':''}" onclick="filtrarMute('${fila.ev.id}')" title="Ocultar este evento y su logística">M</button>
+          </div>`
+        :`<div style="width:70px;"></div>`;
+
+      if(fila.tipo==='event'){
+        const st=statusInfo(dr2);
+        const tL=parseInt(fila.ev.diasPrev)||0;
+        const dL=tL>0?Math.min((fila.ev.doneLogs||[]).length,tL):0;
+        const pct=tL>0?Math.round(dL/tL*100):null;
+        const pbC=pct!==null?pctColor(pct):'#4fc3f7';
+        const pb=pct!==null
+          ?`<span class="log-progress" title="Logística: ${dL}/${tL} días"><span class="log-progress-track"><span class="log-progress-fill" style="width:${pct}%;background:${pbC};"></span></span><span class="log-progress-pct" style="color:${pbC};">${dL}/${tL}</span></span>`
+          :'';
+        html+=`<tr class="row-event ${doneCls} ${todayCls}">
+          <td style="color:var(--text2);font-size:.71rem;">${rowNum}</td>
+          <td><span class="type-tag type-tag-event">● Evento</span></td>
+          <td class="wrap-cell td-name" style="font-weight:700;color:var(--celeste);">📌 ${fila.ev.nombre}${pb}</td>
+          <td>${fila.total>0?`<span style="color:var(--purple);font-weight:600;">${fila.total}d háb.</span>`:'—'}</td>
+          <td>${fmtFecha(fila.ev.inicio)}</td>
+          <td>${fila.ev.fin?fmtFecha(fila.ev.fin):'<span style="color:var(--text2);">—</span>'}</td>
+          <td><span class="badge ${st.cls}">${st.label}</span></td>
+          <td>${drLabel(dr2)}</td>
+          <td>${doneBtn}</td>
+          <td>${acciones}</td>
+        </tr>`;
+      } else {
+        const col=hCol(fila.ratio),bg=hBg(fila.ratio),bd=hBd(fila.ratio),st=statusInfo(dr2);
+        html+=`<tr class="row-logistics ${doneCls} ${todayCls}" style="background:${done?'var(--done-bg)':bg};border-left:3px solid ${col};">
+          <td style="color:var(--text2);font-size:.71rem;">${rowNum}</td>
+          <td><span class="type-tag" style="background:${bg};color:${col};border:1px solid ${bd};">● Logística</span></td>
+          <td class="wrap-cell td-name" style="color:${col};">⚙ ${fila.ev.nombre}</td>
+          <td><span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;background:${bg};border:1px solid ${bd};color:${col};">Día ${fila.diaNum}/${fila.total}</span></td>
+          <td>${fmtFecha(fila.ev.inicio)}</td>
+          <td>${fila.ev.fin?fmtFecha(fila.ev.fin):'<span style="color:var(--text2);">—</span>'}</td>
+          <td><span class="badge ${st.cls}">${st.label}</span></td>
+          <td>${drLabel(dr2)}</td>
+          <td>${doneBtn}</td>
+          <td>${acciones}</td>
+        </tr>`;
+      }
+    });
+  });
+
+  tbody.innerHTML=html;
+  renderStats(todasFilas);
+  renderHeatLegend(hayLog);
+}
+
+function renderStats(filas){
+  const total=eventos.length,nLog=filas.filter(f=>f.tipo==='logistics').length;
+  const venc=filas.filter(f=>f.tipo==='event'&&diasRestantes(f.fechaClave)<0).length;
+  const urg=filas.filter(f=>f.tipo==='event'&&diasRestantes(f.fechaClave)>=0&&diasRestantes(f.fechaClave)<=3).length;
+  const doneT=filas.filter(f=>isDone(f)).length;
+  const pend=filas.filter(f=>f.tipo==='event'&&!isDone(f)).length;
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-chip"><span class="dot" style="background:var(--accent)"></span>${total} evento${total!==1?'s':''}</div>
+    ${nLog>0?`<div class="stat-chip"><span class="dot" style="background:var(--purple)"></span>${nLog} alertas logísticas</div>`:''}
+    ${pend>0?`<div class="stat-chip"><span class="dot" style="background:var(--orange)"></span>${pend} pendiente${pend!==1?'s':''}</div>`:''}
+    ${doneT>0?`<div class="stat-chip"><span class="dot" style="background:var(--green)"></span>${doneT} realizado${doneT!==1?'s':''}</div>`:''}
+    ${venc>0?`<div class="stat-chip"><span class="dot" style="background:var(--red)"></span>${venc} vencido${venc!==1?'s':''}</div>`:''}
+    ${urg>0?`<div class="stat-chip"><span class="dot" style="background:var(--yellow)"></span>${urg} urgente${urg!==1?'s':''}</div>`:''}
+  `;
+}
+function renderHeatLegend(visible){
+  const el=document.getElementById('heatLegend');
+  if(!visible){el.innerHTML='';return;}
+  let sw='';
+  for(let i=0;i<=10;i++){const[r,g,b]=heatRgb(i/10);sw+=`<div class="swatch" style="background:rgb(${r},${g},${b});"></div>`;}
+  el.className='heat-legend';
+  el.innerHTML=`<span>Escala logística:</span><div class="swatches">${sw}</div><span style="font-size:.68rem;">← más tiempo &nbsp;|&nbsp; más urgente →</span>`;
+}
+
+// ── AGREGAR ───────────────────────────────────────────────
+function abrirFormAdd(){
+  ['aNombre','aInicio','aFin'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('aDias').value='0';
+  document.getElementById('aDiasVal').textContent='0';
+  document.getElementById('aError').textContent='';
+  document.getElementById('addOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('aNombre').focus(),80);
+}
+function cerrarAdd(e){if(e&&e.target!==document.getElementById('addOverlay'))return;document.getElementById('addOverlay').classList.remove('open');}
+function agregarEvento(){
+  const nombre=document.getElementById('aNombre').value.trim();
+  const inicio=document.getElementById('aInicio').value;
+  const fin=document.getElementById('aFin').value;
+  const diasPrev=parseInt(document.getElementById('aDias').value)||0;
+  const err=document.getElementById('aError');
+  if(!nombre){err.textContent='Ingresá un nombre.';return;}
+  if(!inicio){err.textContent='Seleccioná la fecha de inicio.';return;}
+  if(fin&&fin<inicio){err.textContent='La fecha de fin no puede ser anterior al inicio.';return;}
+  err.textContent='';
+  eventos.push({id:Date.now().toString(),nombre,inicio,fin:fin||'',diasPrev,done:false,doneLogs:[]});
+  guardar(); render();
+  document.getElementById('addOverlay').classList.remove('open');
+}
+
+// ── EDITAR ────────────────────────────────────────────────
+function abrirEdit(id){
+  const ev=eventos.find(e=>e.id===id);if(!ev)return;
+  editandoId=id;
+  document.getElementById('mNombre').value=ev.nombre;
+  document.getElementById('mInicio').value=ev.inicio;
+  document.getElementById('mFin').value=ev.fin||'';
+  const diasVal = Math.min(Math.max(parseInt(ev.diasPrev)||1, 1), 20);
+  document.getElementById('mDias').value = diasVal;
+  document.getElementById('mDiasVal').textContent = diasVal;
+  document.getElementById('mError').textContent='';
+  document.getElementById('editOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('mNombre').focus(),80);
+}
+function cerrarEdit(e){if(e&&e.target!==document.getElementById('editOverlay'))return;document.getElementById('editOverlay').classList.remove('open');editandoId=null;}
+function guardarEdicion(){
+  const nombre=document.getElementById('mNombre').value.trim();
+  const inicio=document.getElementById('mInicio').value;
+  const fin=document.getElementById('mFin').value;
+  const diasPrev=parseInt(document.getElementById('mDias').value)||0;
+  const err=document.getElementById('mError');
+  if(!nombre){err.textContent='Ingresá un nombre.';return;}
+  if(!inicio){err.textContent='Seleccioná la fecha de inicio.';return;}
+  if(fin&&fin<inicio){err.textContent='La fecha de fin no puede ser anterior al inicio.';return;}
+  const idx=eventos.findIndex(e=>e.id===editandoId);if(idx===-1)return;
+  eventos[idx]={...eventos[idx],nombre,inicio,fin:fin||'',diasPrev};
+  guardar(); render();
+  document.getElementById('editOverlay').classList.remove('open');editandoId=null;
+}
+
+// ── ELIMINAR ──────────────────────────────────────────────
+function eliminar(id){
+  const ev=eventos.find(e=>e.id===id);if(!ev)return;
+  if(!confirm(`¿Eliminar "${ev.nombre}" y todas sus alertas?`))return;
+  eventos=eventos.filter(e=>e.id!==id);guardar();render();
+}
+
+// ── IMPORTAR ──────────────────────────────────────────────
+function abrirImport(){
+  document.getElementById('importTA').value='';
+  document.getElementById('importPreview').innerHTML='';
+  document.getElementById('importMsg').textContent='';
+  document.getElementById('btnConfirmImport').disabled=true;
+  importParsed=[];
+  document.querySelector('#importOverlay .modal h2').textContent='📥 Importar eventos desde archivo';
+  document.getElementById('importOverlay').classList.add('open');
+}
+function cerrarImport(e){if(e&&e.target!==document.getElementById('importOverlay'))return;document.getElementById('importOverlay').classList.remove('open');}
+// ── RESPALDO / RESTAURAR ──────────────────────────────────
+function exportarEventos(){
+  if(eventos.length===0){ alert('No hay eventos para exportar.'); return; }
+
+  // Construir snapshot enriquecido: incluye cada día de logística con su estado
+  const snapshot = {
+    version: 2,
+    fecha_respaldo: dateToStr(hoy()),
+    total_eventos: eventos.length,
+    eventos: eventos.map(ev => {
+      const n = parseInt(ev.diasPrev) || 0;
+      const diasLog = n > 0 ? diasHabilesPrevios(ev.inicio, n) : [];
+      // diasLog[0] = más cercano al evento, diasLog[n-1] = más lejano
+      const logistica = diasLog.map((fecha, idx) => ({
+        fecha,
+        dia_numero: n - idx,           // Día 1 = más lejano, Día N = más cercano
+        completado: (ev.doneLogs || []).includes(fecha)
+      }));
+      return {
+        id:       ev.id,
+        nombre:   ev.nombre,
+        inicio:   ev.inicio,
+        fin:      ev.fin || '',
+        diasPrev: ev.diasPrev,
+        done:     ev.done || false,
+        doneLogs: ev.doneLogs || [],   // fechas de logística completadas (usado al restaurar)
+        logistica                      // detalle legible para auditoría
+      };
+    })
+  };
+
+  const json = JSON.stringify(snapshot, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `agenda_cerritos_${dateToStr(hoy())}.json`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function abrirRestaurar(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    // Resetear el modal de importar y usarlo como ventana de restauración
+    document.getElementById('importTA').value='';
+    document.getElementById('importPreview').innerHTML='';
+    document.getElementById('importMsg').textContent='';
+    document.getElementById('btnConfirmImport').disabled=true;
+    importParsed=[];
+    // Cambiar título del modal temporalmente para indicar que es una restauración
+    document.querySelector('#importOverlay .modal h2').textContent='🔄 Restaurar desde respaldo';
+    previsualizarImportJSON(ev.target.result);
+    document.getElementById('importOverlay').classList.add('open');
+  };
+  reader.readAsText(file,'UTF-8');
+  input.value='';
+}
+
+function leerArchivoImport(input){
+  const file=input.files[0];if(!file)return;
+  const esJson=file.name.toLowerCase().endsWith('.json');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    if(esJson){
+      previsualizarImportJSON(ev.target.result);
+    } else {
+      document.getElementById('importTA').value=ev.target.result;
+      previsualizarImport();
+    }
+  };
+  reader.readAsText(file,'UTF-8');input.value='';
+}
+
+function previsualizarImportJSON(texto){
+  const preview = document.getElementById('importPreview');
+  const msg     = document.getElementById('importMsg');
+  const btn     = document.getElementById('btnConfirmImport');
+  document.getElementById('importTA').value = '';
+
+  try{
+    const raw = JSON.parse(texto);
+
+    // Detectar formato: v2 (wrapper con .eventos) o v1 (array plano)
+    let evArray;
+    if(Array.isArray(raw)){
+      evArray = raw;                        // formato v1 (backup antiguo)
+    } else if(raw.eventos && Array.isArray(raw.eventos)){
+      evArray = raw.eventos;                // formato v2 (backup actual)
+    } else {
+      throw new Error('Formato de archivo no reconocido.');
+    }
+
+    const validos = evArray.filter(e => e.nombre && e.inicio);
+    if(validos.length === 0) throw new Error('No se encontraron eventos válidos.');
+    importParsed = validos;
+
+    // Calcular totales de logística
+    let totalLogDias = 0, totalLogComp = 0;
+    validos.forEach(e => {
+      const n = parseInt(e.diasPrev) || 0;
+      totalLogDias += n;
+      totalLogComp += (e.doneLogs || []).length;
+    });
+
+    // Vista previa tabla
+    let rows = validos.slice(0, 10).map((e, i) => {
+      const n     = parseInt(e.diasPrev) || 0;
+      const comp  = (e.doneLogs || []).length;
+      const logCell = n > 0
+        ? `<span style="color:${comp===n?'var(--green)':comp>0?'var(--yellow)':'var(--text2)'};">${comp}/${n}</span>`
+        : '—';
+      const evDone = e.done
+        ? `<span style="color:var(--green);">✓</span>`
+        : `<span style="color:var(--text2);">○</span>`;
+      return `<tr>
+        <td style="color:var(--text2);">${i+1}</td>
+        <td>${e.nombre}</td>
+        <td>${fmtFecha(e.inicio)}</td>
+        <td>${e.fin?fmtFecha(e.fin):'—'}</td>
+        <td style="text-align:center;">${n||'—'}</td>
+        <td style="text-align:center;">${logCell}</td>
+        <td style="text-align:center;">${evDone}</td>
+      </tr>`;
+    }).join('');
+    const extra = validos.length > 10
+      ? `<tr><td colspan="7" style="text-align:center;color:var(--text2);font-size:.72rem;padding:6px;">...y ${validos.length-10} más</td></tr>`
+      : '';
+
+    preview.innerHTML = `<div class="import-preview"><table>
+      <thead><tr><th>#</th><th>Descripción</th><th>Inicio</th><th>Fin</th><th>Días log.</th><th>Log. hechos</th><th>Evento</th></tr></thead>
+      <tbody>${rows}${extra}</tbody>
+    </table></div>`;
+
+    const fechaRespaldo = raw.fecha_respaldo ? ` (respaldo del ${fmtFecha(raw.fecha_respaldo)})` : '';
+    const existentes = eventos.length;
+    msg.innerHTML = `
+      <span style="color:var(--green);font-weight:600;">✓ ${validos.length} evento${validos.length!==1?'s':''}${fechaRespaldo}</span>
+      &nbsp;·&nbsp; <span style="color:var(--purple);">${totalLogDias} días logísticos (${totalLogComp} completados)</span>
+      ${existentes>0?`<br><span style="color:var(--orange);font-size:.75rem;">⚠ Se agregarán a los ${existentes} eventos existentes. Para reemplazar todo, borrá los actuales primero.</span>`:''}`;
+    btn.disabled = false;
+
+  } catch(e){
+    preview.innerHTML = '';
+    msg.innerHTML = `<span style="color:var(--red);">Error: ${e.message}</span>`;
+    btn.disabled = true;
+    importParsed = [];
+  }
+}
+function parseImportDate(str){
+  str=(str||'').trim();if(!str)return null;
+  let m=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  m=str.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m)return str;
+  m=str.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  return null;
+}
+function previsualizarImport(){
+  const lineas=document.getElementById('importTA').value.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  importParsed=[];let htmlRows='',errCount=0;
+  lineas.forEach((linea,i)=>{
+    const p=linea.split(',');
+    const nombre=(p[0]||'').trim(),rawIni=(p[1]||'').trim(),rawFin=(p[2]||'').trim(),rawDias=(p[3]||'').trim();
+    const inicio=parseImportDate(rawIni),fin=rawFin?parseImportDate(rawFin):inicio;
+    const diasPrev=parseInt(rawDias)||0,errores=[];
+    if(!nombre)errores.push('sin nombre');
+    if(!inicio)errores.push('fecha inicio inválida');
+    if(rawFin&&!fin)errores.push('fecha fin inválida');
+    if(fin&&inicio&&fin<inicio)errores.push('fin < inicio');
+    if(errores.length)errCount++;
+    htmlRows+=`<tr class="${errores.length?'row-err':''}">
+      <td style="color:var(--text2);">${i+1}</td><td>${nombre||'—'}</td>
+      <td>${inicio?fmtFecha(inicio):`<span style="color:var(--red)">${rawIni||'—'}</span>`}</td>
+      <td>${fin&&fin!==inicio?fmtFecha(fin):'—'}</td>
+      <td style="text-align:center;">${diasPrev||'—'}</td>
+      <td style="color:${errores.length?'var(--red)':'var(--green)'};">${errores.length?errores.join(', '):'✓'}</td>
+    </tr>`;
+    if(!errores.length) importParsed.push({nombre,inicio,fin:fin||'',diasPrev});
+  });
+  const preview=document.getElementById('importPreview');
+  if(!lineas.length){preview.innerHTML='';return;}
+  preview.innerHTML=`<div class="import-preview"><table><thead><tr><th>#</th><th>Descripción</th><th>Inicio</th><th>Fin</th><th>Días</th><th>Estado</th></tr></thead><tbody>${htmlRows}</tbody></table></div>`;
+  const msg=document.getElementById('importMsg'),btn=document.getElementById('btnConfirmImport');
+  if(importParsed.length){
+    msg.innerHTML=`<span style="color:var(--green);">✓ ${importParsed.length} evento${importParsed.length!==1?'s':''} listos para importar</span>`+(errCount?` <span style="color:var(--orange);">(${errCount} con error serán ignorados)</span>`:'');
+    btn.disabled=false;
+  } else {
+    msg.innerHTML=`<span style="color:var(--red);">No hay líneas válidas.</span>`;btn.disabled=true;
+  }
+}
+function confirmarImport(){
+  if(!importParsed.length)return;
+  importParsed.forEach(ev=>{
+    // Si viene de JSON (tiene id propio), preservar todos los campos incluyendo done/doneLogs
+    const esRespaldoJSON = ev.id !== undefined;
+    eventos.push({
+      id: esRespaldoJSON && ev.id ? ev.id : Date.now().toString()+Math.random().toString(36).slice(2,6),
+      nombre:   ev.nombre,
+      inicio:   ev.inicio,
+      fin:      ev.fin||'',
+      diasPrev: parseInt(ev.diasPrev)||0,
+      done:     esRespaldoJSON ? (ev.done||false) : false,
+      doneLogs: esRespaldoJSON ? (ev.doneLogs||[]) : []
+    });
+  });
+  guardar(); render();
+  document.getElementById('importOverlay').classList.remove('open');importParsed=[];
+}
+
+// ── TECLADO ───────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    cerrarFilterPanel();
+    ['addOverlay','editOverlay','importOverlay'].forEach(id=>document.getElementById(id).classList.remove('open'));
+    editandoId=null;
+  }
+  if(e.key==='Enter'){
+    if(document.getElementById('addOverlay').classList.contains('open')) agregarEvento();
+    else if(editandoId) guardarEdicion();
+  }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Proteger config.php de acceso web directo
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Proteger crear_hash.php (borrarlo después de usar, pero por si acaso)
+<Files "crear_hash.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Habilitar sesiones y cabeceras
+Options -Indexes
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options SAMEORIGIN
